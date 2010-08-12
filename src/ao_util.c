@@ -61,14 +61,14 @@ void dumphex(guint8* data, guint32 len)
 }
 
 // Compare addresses
-gboolean cmp_ipv4(in_addr* a, in_addr* b)
+gboolean cmp_ipv4(struct in_addr* a, struct in_addr* b)
 {
-    if ((guint32)(*a) != (guint32)(*b))
+    if (*((guint32*)a) != *((guint32*)b))
         return FALSE;
     return TRUE;
 }
 
-gboolean cmp_ipv6(in6_addr* a, in6_addr* b)
+gboolean cmp_ipv6(struct in6_addr* a, struct in6_addr* b)
 {
     gint i;
     for (i=0; i<8; i++) {
@@ -79,16 +79,16 @@ gboolean cmp_ipv6(in6_addr* a, in6_addr* b)
     return TRUE;
 }
 
-gboolean cmp_ipv4_mask(in_addr* a, in_addr* b, in_addr* mask)
+gboolean cmp_ipv4_mask(struct in_addr* a, struct in_addr* b, struct in_addr* mask)
 {
-    guint32 am = (guint32)(*a) & (guint32)(*mask);
-    guint32 bm = (guint32)(*b) & (guint32)(*mask);
-    if (a != b)
+    guint32 am = *((guint32*)a) & *((guint32*)mask);
+    guint32 bm = *((guint32*)b) & *((guint32*)mask);
+    if (am != bm)
         return FALSE;
     return TRUE;
 }
 
-gboolean cmp_ipv6_mask(in6_addr* a, in6_addr* b, in6_addr* mask)
+gboolean cmp_ipv6_mask(struct in6_addr* a, struct in6_addr* b, struct in6_addr* mask)
 {
     gint i;
     for (i=0; i<8; i++) {
@@ -100,13 +100,13 @@ gboolean cmp_ipv6_mask(in6_addr* a, in6_addr* b, in6_addr* mask)
 }
 
 // Copy addresses
-void cpy_ipv4(in_addr* dst, in_addr* src)
+void cpy_ipv4(struct in_addr* dst, struct in_addr* src)
 {
-    g_memmove(dst, src, sizeof(in_addr));
+    g_memmove(dst, src, sizeof(struct in_addr));
 }
 
-void cpy_ipv6(in6_addr* dst, in6_addr* src)
+void cpy_ipv6(struct in6_addr* dst, struct in6_addr* src)
 {
-    g_memmove(dst, src, sizeof(in6_addr));
+    g_memmove(dst, src, sizeof(struct in6_addr));
 }
 

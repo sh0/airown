@@ -56,7 +56,7 @@ typedef struct {
     // General
     gboolean dir_send;
     // Payload
-    uint32 pl_size;
+    guint32 pl_size;
     guint8* pl_data;
 } st_tcp_pck;
 
@@ -76,20 +76,21 @@ typedef struct {
         struct in_addr ip4_b;
         struct in6_addr ip6_b;
     };
-    uint32 proto;
+    guint32 proto;
     
     // Ports
-    uint16 port_a;
-    uint16 port_b;
+    guint16 port_a;
+    guint16 port_b;
     
     // Seqencer
-    uint32 seq_a;
-    uint32 seq_b;
+    guint32 seq_a;
+    guint32 seq_b;
     
     // Packet stack
     GQueue* pck_queue;
     guint32 pck_num;
-    guint32 pck_size;
+    guint32 pck_total_size;
+    guint32 pck_buf_size;
     
     // Timing
     GTimeVal time_first;
@@ -97,7 +98,19 @@ typedef struct {
     
     // Layer 5
     en_pl_type pl_type;
+    
+    // Log
+    FILE* log_file;
 } st_tcp_con;
+
+// Functions
+gint ctx_tcp_cmp(gconstpointer ptr_a, gconstpointer ptr_b);
+void ctx_tcp_syn(st_ao_packet* pck);
+void ctx_tcp_fin(st_tcp_con* con);
+void ctx_tcp_pck(st_tcp_con* con, st_ao_packet* pck);
+void ctx_tcp_pl(st_tcp_con* con);
+void ctx_tcp_proc(st_ao_packet* pck);
+void ctx_tcp_audit();
 
 #endif
 

@@ -27,6 +27,7 @@
 // Functions
 gboolean ao_payload_init();
 void ao_payload_end();
+void ao_payload_pck(st_ao_packet* pck);
 
 #endif
 

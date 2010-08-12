@@ -43,6 +43,18 @@ static GOptionEntry cmd_entry_debug[] = {
     { "dbg-dump", 'u', 0, G_OPTION_ARG_STRING, &(ao_inst.cmd_dbg_dump), "Dump raw data about protocols (default=none)" },
     { NULL }
 };
+static GOptionEntry cmd_entry_nat[] = {
+    { "nat4-ip", 0, 0, G_OPTION_ARG_STRING, &(ao_inst.cmd_nat4_ip), "IPv4 NAT address" },
+    { "nat4-mask", 0, 0, G_OPTION_ARG_STRING, &(ao_inst.cmd_nat4_mask), "IPv4 NAT mask" },
+    { "nat6-ip", 0, 0, G_OPTION_ARG_STRING, &(ao_inst.cmd_nat6_ip), "IPv6 NAT address" },
+    { "nat6-mask", 0, 0, G_OPTION_ARG_STRING, &(ao_inst.cmd_nat6_mask), "IPv6 NAT mask" },
+    { NULL }
+};
+static GOptionEntry cmd_entry_tcp[] = {
+    { "tcp-raw", 0, 0, G_OPTION_ARG_STRING, &(ao_inst.cmd_tcp_raw), "TCP raw connection log path" },
+    { "tcp-http", 0, 0, G_OPTION_ARG_STRING, &(ao_inst.cmd_tcp_http), "TCP HTTP connection log path" },
+    { NULL }
+};
 
 // Main
 int main(int argc, char* argv[]) {
@@ -60,6 +72,12 @@ int main(int argc, char* argv[]) {
     ao_inst.cmd_dbg_mask = NULL;
     ao_inst.cmd_dbg_show = NULL;
     ao_inst.cmd_dbg_dump = NULL;
+    ao_inst.cmd_nat4_ip = NULL;
+    ao_inst.cmd_nat4_mask = NULL;
+    ao_inst.cmd_nat6_ip = NULL;
+    ao_inst.cmd_nat6_mask = NULL;
+    ao_inst.cmd_tcp_raw = NULL;
+    ao_inst.cmd_tcp_http = NULL;
     ao_inst.dbg_mask = 0;
     ao_inst.dbg_show = AO_PROTO_ALL;
     ao_inst.dbg_dump = 0;
@@ -70,11 +88,19 @@ int main(int argc, char* argv[]) {
 
     cmd_ctx = g_option_context_new("- 802.11 packet injection tool");
     g_option_context_add_main_entries(cmd_ctx, cmd_entry_main, NULL);
+    g_option_context_set_description(cmd_ctx, "Avilable protocols: ieee80211, ipv4, ipv6, arp, tcp, udp, payload");
     
     GOptionGroup* cmd_grp_dbg = g_option_group_new("debug", "Debugging Options:", "Debugging options", NULL, NULL);
     g_option_group_add_entries(cmd_grp_dbg, cmd_entry_debug);
     g_option_context_add_group(cmd_ctx, cmd_grp_dbg);
-    g_option_context_set_description(cmd_ctx, "Avilable protocols: ieee80211, ipv4, ipv6, arp, tcp, udp");
+    
+    GOptionGroup* cmd_grp_nat = g_option_group_new("nat", "NAT Options:", "NAT options", NULL, NULL);
+    g_option_group_add_entries(cmd_grp_nat, cmd_entry_nat);
+    g_option_context_add_group(cmd_ctx, cmd_grp_nat);
+    
+    GOptionGroup* cmd_grp_tcp = g_option_group_new("tcp", "TCP Options:", "TCP options", NULL, NULL);
+    g_option_group_add_entries(cmd_grp_tcp, cmd_entry_tcp);
+    g_option_context_add_group(cmd_ctx, cmd_grp_tcp);
     
     if (!g_option_context_parse(cmd_ctx, &argc, &argv, &cmd_error)) {
         g_print("Option parsing failed: %s\n", cmd_error->message);

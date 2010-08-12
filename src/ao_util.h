@@ -28,13 +28,13 @@
 void dumphex(guint8* data, guint32 len);
 
 // Compare addresses
-gboolean cmp_ipv4(in_addr* a, in_addr* b);
-gboolean cmp_ipv6(in6_addr* a, in6_addr* b);
-gboolean cmp_ipv4_mask(in_addr* a, in_addr* b, in_addr* mask);
-gboolean cmp_ipv6_mask(in6_addr* a, in6_addr* b, in6_addr* mask);
+gboolean cmp_ipv4(struct in_addr* a, struct in_addr* b);
+gboolean cmp_ipv6(struct in6_addr* a, struct in6_addr* b);
+gboolean cmp_ipv4_mask(struct in_addr* a, struct in_addr* b, struct in_addr* mask);
+gboolean cmp_ipv6_mask(struct in6_addr* a, struct in6_addr* b, struct in6_addr* mask);
 
 // Copy addresses
-void cpy_ipv4(in_addr* dst, in_addr* src);
-void cpy_ipv6(in6_addr* dst, in6_addr* src);
+void cpy_ipv4(struct in_addr* dst, struct in_addr* src);
+void cpy_ipv6(struct in6_addr* dst, struct in6_addr* src);
 
 #endif
