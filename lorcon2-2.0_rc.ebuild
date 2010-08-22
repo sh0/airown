@@ -1,9 +1,10 @@
-# Copyright 1999-2006 Gentoo Foundation
+# Copyright 1999-2010 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
-# Nonofficial ebuild by sh0
 
-inherit eutils distutils subversion
+EAPI="2"
+
+inherit autotools subversion
 
 MY_P="lorcon2"
 S=${WORKDIR}/${MY_P}
@@ -18,20 +19,16 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE=""
 
-DEPEND=""
-RDEPEND=""
+DEPEND="dev-libs/libnl
+		net-libs/libpcap"
+RDEPEND="${DEPEND}"
 
-src_unpack() {
-    subversion_fetch
-}
-
-src_compile() {
-	econf --prefix=/usr || die "econf failed"
-	emake CC="gcc" || die "compile failed"
+src_prepare() {
+	eautoreconf
 }
 
 src_install() {
-	dodir /usr/lib
-	dodir /usr/include
 	emake DESTDIR=${D} install || die "install failed"
+	# Punt useless libtool's .la files
+	find "${D}" -name '*.la' -delete
 }
