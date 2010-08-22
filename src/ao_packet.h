@@ -36,6 +36,13 @@ struct llc_hdr {
     uint16_t type;
 } __attribute__ ((packed));
 
+// TCP timestamp
+struct t_tcp_timestamp {
+    guint32 time_a;
+    guint32 time_b;
+} __attribute__ ((packed));
+typedef struct t_tcp_timestamp st_tcp_timestamp;
+
 // Layer 2
 #define AO_M2_NONE 0
 #define AO_M2_IEEE80211 1
@@ -88,6 +95,7 @@ struct t_ao_packet {
     union {
         struct {
             struct tcphdr* hdr;
+            st_tcp_timestamp* ts;
         } tcp;
         struct {
             struct udphdr* hdr;

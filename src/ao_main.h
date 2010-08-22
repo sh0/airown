@@ -41,6 +41,7 @@ struct t_ao_inst {
     // Libnet
     libnet_t* ln_inst; // = NULL;
     libnet_ptag_t ln_tcp_t; // = 0; // IMPORTANT!
+    libnet_ptag_t ln_thd_t; // = 0; // IMPORTANT!
     libnet_ptag_t ln_ip_t; // = 0; // IMPORTANT!
     // Command line (main)
     gchar* cmd_iface; // = "wlan0";

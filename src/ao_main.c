@@ -63,6 +63,7 @@ int main(int argc, char* argv[]) {
     ao_inst.lor_ctx = NULL;
     ao_inst.ln_inst = NULL;
     ao_inst.ln_tcp_t = 0;
+    ao_inst.ln_thd_t = 0;
     ao_inst.ln_ip_t = 0;
     ao_inst.cmd_iface = "wlan0";
     ao_inst.cmd_driver = NULL;
