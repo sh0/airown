@@ -1,5 +1,5 @@
 /*
- * Airown - payload
+ * Airown - layer 4 analysis
  *
  * Copyright (C) 2010 sh0 <sh0@yutani.ee>
  *
@@ -18,17 +18,18 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef H_AO_PAYLOAD
-#define H_AO_PAYLOAD
+#ifndef H_PK_LAYER4
+#define H_PK_LAYER4
 
 // Int inc
 #include "ao_config.h"
 #include "pk_packet.h"
 
 // Functions
-gboolean ao_payload_init();
-void ao_payload_end();
-void ao_payload_pck(st_ao_packet* pck);
+void pck_tcp_read(st_ao_packet* pck);
+void pck_tcp_free(st_ao_packet* pck);
+void pck_udp_read(st_ao_packet* pck);
+void pck_udp_free(st_ao_packet* pck);
 
 #endif
 

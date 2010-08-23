@@ -23,6 +23,7 @@
 
 // Int inc
 #include "ao_config.h"
+#include "ao_main.h"
 
 // LLC header
 #define LLC_TYPE_IPV4 0x0008
@@ -114,20 +115,6 @@ typedef struct t_ao_packet st_ao_packet;
 // Monitoring
 void ao_pck_loop(lorcon_t* context, lorcon_packet_t* packet, u_char* user);
 void ao_pck_log(st_ao_packet* pck);
-void ao_pck_ieee80211_read(st_ao_packet* pck);
-void ao_pck_ieee80211_free(st_ao_packet* pck);
-void ao_pck_ipv4_read(st_ao_packet* pck);
-void ao_pck_ipv4_free(st_ao_packet* pck);
-void ao_pck_ipv6_read(st_ao_packet* pck);
-void ao_pck_ipv6_free(st_ao_packet* pck);
-void ao_pck_tcp_read(st_ao_packet* pck);
-void ao_pck_tcp_free(st_ao_packet* pck);
-void ao_pck_udp_read(st_ao_packet* pck);
-void ao_pck_udp_free(st_ao_packet* pck);
-
-// Injecting
-void ao_inj_tcp(st_ao_packet* pck, guint8* pl_data, guint32 pl_size);
-void ao_inj_tcp_raw(st_ao_packet* pck, guint8* rsp_data, guint32 rsp_len, guint8 tcp_flags, guint32* tcp_seq);
 
 #endif
 

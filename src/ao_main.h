@@ -53,14 +53,6 @@ struct t_ao_inst {
     gchar* cmd_dbg_mask; // = NULL;
     gchar* cmd_dbg_show; // = NULL;
     gchar* cmd_dbg_dump; // = NULL;
-    // NAT masks
-    gchar* cmd_nat4_ip; // = NULL;
-    gchar* cmd_nat4_mask; // = NULL;
-    gchar* cmd_nat6_ip; // = NULL;
-    gchar* cmd_nat6_mask; // = NULL;
-    // Command line (tcp)
-    gchar* cmd_tcp_raw; // = NULL;
-    gchar* cmd_tcp_http; // = NULL;
     // Debug masks
     guint32 dbg_mask; // = 0;
     guint32 dbg_show; // = 0;

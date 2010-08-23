@@ -1,5 +1,5 @@
 /*
- * Airown - payload
+ * Airown - injecting TCP packets
  *
  * Copyright (C) 2010 sh0 <sh0@yutani.ee>
  *
@@ -18,17 +18,15 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef H_AO_PAYLOAD
-#define H_AO_PAYLOAD
+#ifndef H_PK_INJECT_TCP
+#define H_PK_INJECT_TCP
 
 // Int inc
 #include "ao_config.h"
 #include "pk_packet.h"
 
 // Functions
-gboolean ao_payload_init();
-void ao_payload_end();
-void ao_payload_pck(st_ao_packet* pck);
+void inj_tcp(st_ao_packet* pck, guint8* pl_data, guint32 pl_size);
 
 #endif
 
