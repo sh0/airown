@@ -21,11 +21,10 @@
 // Int inc
 #include "ao_config.h"
 #include "ao_main.h"
+#include "ao_packet.h"
 #include "ao_payload.h"
 #include "ao_util.h"
 #include "http_parser.h"
-#include "pk_packet.h"
-#include "pk_inject_tcp.h"
 
 // Payload structure
 #define PL_CAP_NONE 0
@@ -309,7 +308,7 @@ void ao_payload_inj(st_ao_packet* pck, st_pl_target* target)
         
         // Inject
         guint32 inj_size = strlen(inj_head) + target->inj_http_pl_size;
-        inj_tcp(pck, inj_data, inj_size);
+        ao_inj_tcp(pck, inj_data, inj_size);
         
         // Free data
         g_free(inj_data);

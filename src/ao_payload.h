@@ -23,7 +23,6 @@
 
 // Int inc
 #include "ao_config.h"
-#include "pk_packet.h"
 
 // Functions
 gboolean ao_payload_init();
