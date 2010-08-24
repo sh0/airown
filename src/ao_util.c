@@ -68,14 +68,13 @@ gboolean cmp_ipv4(struct in_addr* a, struct in_addr* b)
     return TRUE;
 }
 
-gboolean cmp_ipv6(struct in6_addr* a, struct in6_addr* b)
+gboolean cmp_ipv6(struct libnet_in6_addr* a, struct libnet_in6_addr* b)
 {
     gint i;
     for (i=0; i<8; i++) {
-        if (a->s6_addr16[i] != b->s6_addr16[i])
+        if (a->__u6_addr.__u6_addr16[i] != b->__u6_addr.__u6_addr16[i])
             return FALSE;
     }
-    
     return TRUE;
 }
 
@@ -88,14 +87,16 @@ gboolean cmp_ipv4_mask(struct in_addr* a, struct in_addr* b, struct in_addr* mas
     return TRUE;
 }
 
-gboolean cmp_ipv6_mask(struct in6_addr* a, struct in6_addr* b, struct in6_addr* mask)
+gboolean cmp_ipv6_mask(struct libnet_in6_addr* a,
+                       struct libnet_in6_addr* b,
+                       struct libnet_in6_addr* mask)
 {
     gint i;
     for (i=0; i<8; i++) {
-        if ((a->s6_addr16[i] & mask->s6_addr16[i]) != (b->s6_addr16[i] & mask->s6_addr16[i]))
+        if ((a->__u6_addr.__u6_addr16[i] & mask->__u6_addr.__u6_addr16[i]) !=
+            (b->__u6_addr.__u6_addr16[i] & mask->__u6_addr.__u6_addr16[i]))
             return FALSE;
     }
-    
     return TRUE;
 }
 
@@ -105,8 +106,8 @@ void cpy_ipv4(struct in_addr* dst, struct in_addr* src)
     g_memmove(dst, src, sizeof(struct in_addr));
 }
 
-void cpy_ipv6(struct in6_addr* dst, struct in6_addr* src)
+void cpy_ipv6(struct libnet_in6_addr* dst, struct libnet_in6_addr* src)
 {
-    g_memmove(dst, src, sizeof(struct in6_addr));
+    g_memmove(dst, src, sizeof(struct libnet_in6_addr));
 }
 
