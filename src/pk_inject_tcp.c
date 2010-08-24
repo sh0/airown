@@ -38,7 +38,7 @@ void inj_tcp(st_ao_packet* pck, guint8* pl_data, guint32 pl_size)
     //printf("* injecting: %s\n", response_data);
 
     // Sequence
-    guint32 tcp_seq = ntohl(pck->m4.tcp.hdr->ack_seq);
+    guint32 tcp_seq = ntohl(pck->m4.tcp.hdr->th_ack);
     
     //usleep(1000 * 10);
     
@@ -67,7 +67,7 @@ static void inj_tcp_raw(st_ao_packet* pck, guint8* rsp_data, guint32 rsp_len, gu
     printf("[inj] sending! len=%u\n", rsp_len);
 
     // libnet wants the data in host-byte-order
-    u_int tcp_ack = ntohl(pck->m4.tcp.hdr->seq) + (ntohs(pck->m3.ipv4.hdr->ip_len) - pck->m3.ipv4.hdr->ip_hl * 4 - pck->m4.tcp.hdr->doff * 4);
+    u_int tcp_ack = ntohl(pck->m4.tcp.hdr->th_seq) + (ntohs(pck->m3.ipv4.hdr->ip_len) - pck->m3.ipv4.hdr->ip_hl * 4 - pck->m4.tcp.hdr->th_off * 4);
 
     // Timestamps
     guint8 time_data[12] = {
@@ -97,8 +97,8 @@ static void inj_tcp_raw(st_ao_packet* pck, guint8* rsp_data, guint32 rsp_len, gu
     
     // TCP
     pck->ao_inst->ln_tcp_t = libnet_build_tcp(
-        ntohs(pck->m4.tcp.hdr->dest), // source port
-        ntohs(pck->m4.tcp.hdr->source), // dest port
+        ntohs(pck->m4.tcp.hdr->th_dport), // source port
+        ntohs(pck->m4.tcp.hdr->th_sport), // dest port
         *tcp_seq, // sequence number
         tcp_ack, // ack number
         tcp_flags, // flags

@@ -162,12 +162,14 @@ void ao_pck_log(st_ao_packet* pck)
     // Layer 4
     if ((pck->m4_type == AO_M4_TCP) && (dshow & AO_PROTO_L4_TCP)) {
         g_print("* tcp! port_src=%hu, port_dst=%hu, checksum=0x%04x, len=%hu\n",
-            ntohs(pck->m4.tcp.hdr->source), ntohs(pck->m4.tcp.hdr->dest),
-            ntohs(pck->m4.tcp.hdr->check), pck->m4.tcp.hdr->doff * 4
+            ntohs(pck->m4.tcp.hdr->th_sport), ntohs(pck->m4.tcp.hdr->th_dport),
+            ntohs(pck->m4.tcp.hdr->th_sum), pck->m4.tcp.hdr->th_off * 4
         );
         g_print("* tcp! res_seq=0x%08x, ack_seq=0x%08x, fin=%u, syn=%u, rst=%u, psh=%u, ack=%u, urg=%u\n", //, ece=%u, cwr=%u
-            ntohl(pck->m4.tcp.hdr->seq), ntohl(pck->m4.tcp.hdr->ack_seq),
-            pck->m4.tcp.hdr->fin, pck->m4.tcp.hdr->syn, pck->m4.tcp.hdr->rst, pck->m4.tcp.hdr->psh, pck->m4.tcp.hdr->ack, pck->m4.tcp.hdr->urg
+            ntohl(pck->m4.tcp.hdr->th_seq), ntohl(pck->m4.tcp.hdr->th_ack),
+            pck->m4.tcp.hdr->th_flags & TH_FIN, pck->m4.tcp.hdr->th_flags & TH_SYN, 
+			pck->m4.tcp.hdr->th_flags & TH_RST, pck->m4.tcp.hdr->th_flags & TH_PUSH,
+			pck->m4.tcp.hdr->th_flags & TH_ACK, pck->m4.tcp.hdr->th_flags & TH_URG
             //pck->m4.tcp.hdr->ece, pck->m4.tcp.hdr->cwr
         );
         if (pck->m4.tcp.ts) {

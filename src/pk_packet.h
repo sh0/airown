@@ -88,7 +88,7 @@ struct t_ao_packet {
     // Layer 4
     union {
         struct {
-            struct tcphdr* hdr;
+            struct libnet_tcp_hdr* hdr;
             st_tcp_timestamp* ts;
         } tcp;
         struct {

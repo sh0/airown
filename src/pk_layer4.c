@@ -25,20 +25,20 @@
 // Functions
 void pck_tcp_read(st_ao_packet* pck)
 {
-    if (pck->m4_size >= sizeof(struct tcphdr)) {
+    if (pck->m4_size >= sizeof(struct libnet_tcp_hdr)) {
         // Header
-        pck->m4.tcp.hdr = (struct tcphdr*) pck->m4_data;
+        pck->m4.tcp.hdr = (struct libnet_tcp_hdr*) pck->m4_data;
         
         // Lengths and offsets
         guint16 tcp_len = 0;
         if (pck->m3_type == AO_M3_IPV4) {
-            tcp_len = ntohs(pck->m3.ipv4.hdr->ip_len) - (pck->m3.ipv4.hdr->ip_hl * 4) - (pck->m4.tcp.hdr->doff * 4);
+            tcp_len = ntohs(pck->m3.ipv4.hdr->ip_len) - (pck->m3.ipv4.hdr->ip_hl * 4) - (pck->m4.tcp.hdr->th_off * 4);
         } else if (pck->m3_type == AO_M3_IPV6) {
-            tcp_len = ntohs(pck->m3.ipv4.hdr->ip_len) - sizeof(struct libnet_ipv6_hdr) - (pck->m4.tcp.hdr->doff * 4);
+            tcp_len = ntohs(pck->m3.ipv4.hdr->ip_len) - sizeof(struct libnet_ipv6_hdr) - (pck->m4.tcp.hdr->th_off * 4);
         } else {
             return;
         }
-        gint32 tcp_off = (gint32)(pck->m4.tcp.hdr->doff * 4) - sizeof(struct tcphdr);
+        gint32 tcp_off = (gint32)(pck->m4.tcp.hdr->th_off * 4) - sizeof(struct libnet_tcp_hdr);
         if (tcp_off < 0 || tcp_off + tcp_len > pck->m4_size) {
             //printf("* tcph! offset/size problem! tcp_len=%u, tcp_off=%d, tcp_size=%u\n", tcp_len, tcp_off, pck->m4_size);
             return;
@@ -46,7 +46,7 @@ void pck_tcp_read(st_ao_packet* pck)
         
         // Options
         pck->m4.tcp.ts = NULL;
-        gint32 opt_len = (pck->m4.tcp.hdr->doff * 4) - 20;
+        gint32 opt_len = (pck->m4.tcp.hdr->th_off * 4) - 20;
         //g_print("[dbg] opt_len=%d\n", opt_len);
         if (opt_len > 0) {
             guint8* opt_ptr = pck->m4_data + 20;
