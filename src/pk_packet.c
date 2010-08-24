@@ -140,12 +140,12 @@ void ao_pck_log(st_ao_packet* pck)
             (pck->m3.ipv4.hdr->daddr) & 0xff, (pck->m3.ipv4.hdr->daddr >> 8) & 0xff, (pck->m3.ipv4.hdr->daddr >> 16) & 0xff, (pck->m3.ipv4.hdr->daddr >> 24) & 0xff);
     } else if ((pck->m3_type == AO_M3_IPV6) && (dshow & AO_PROTO_L3_IPV6)) {
         g_print("* ipv6! proto=%u, is_tcp=%u, is_udp=%u\n",
-            pck->m3.ipv6.hdr->nexthdr,
-            pck->m3.ipv6.hdr->nexthdr == IPPROTO_TCP ? 1 : 0,
-            pck->m3.ipv6.hdr->nexthdr == IPPROTO_UDP ? 1 : 0
+            pck->m3.ipv6.hdr->ip_nh,
+            pck->m3.ipv6.hdr->ip_nh == IPPROTO_TCP ? 1 : 0,
+            pck->m3.ipv6.hdr->ip_nh == IPPROTO_UDP ? 1 : 0
         );
-        guint16* saddr = pck->m3.ipv6.hdr->saddr.s6_addr16;
-        guint16* daddr = pck->m3.ipv6.hdr->daddr.s6_addr16;
+        guint16* saddr = pck->m3.ipv6.hdr->ip_src.__u6_addr.__u6_addr16;
+        guint16* daddr = pck->m3.ipv6.hdr->ip_dst.__u6_addr.__u6_addr16;
         g_print("* ipv6! src=%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x\n",
             saddr[0], saddr[1], saddr[2], saddr[3], saddr[4], saddr[5], saddr[6], saddr[7]
         );

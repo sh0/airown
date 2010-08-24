@@ -85,7 +85,7 @@ struct t_ao_packet {
             struct iphdr* hdr;
         } ipv4;
         struct {
-            struct ipv6hdr* hdr;
+            struct libnet_ipv6_hdr* hdr;
         } ipv6;
     } m3;
     guint32 m3_type;

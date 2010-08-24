@@ -41,12 +41,6 @@
 #include <pthread.h>
 #include <time.h>
 
-// Linux if
-#include <linux/if_packet.h>
-#include <linux/if_ether.h>
-#include <linux/wireless.h>
-#include <linux/ipv6.h>
-
 // Lorcon
 #include <lorcon.h>
 #include <lorcon_ieee80211.h>

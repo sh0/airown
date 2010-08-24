@@ -34,7 +34,7 @@ void pck_tcp_read(st_ao_packet* pck)
         if (pck->m3_type == AO_M3_IPV4) {
             tcp_len = ntohs(pck->m3.ipv4.hdr->tot_len) - (pck->m3.ipv4.hdr->ihl * 4) - (pck->m4.tcp.hdr->doff * 4);
         } else if (pck->m3_type == AO_M3_IPV6) {
-            tcp_len = ntohs(pck->m3.ipv4.hdr->tot_len) - sizeof(struct ipv6hdr) - (pck->m4.tcp.hdr->doff * 4);
+            tcp_len = ntohs(pck->m3.ipv4.hdr->tot_len) - sizeof(struct libnet_ipv6_hdr) - (pck->m4.tcp.hdr->doff * 4);
         } else {
             return;
         }

@@ -68,20 +68,20 @@ void pck_ipv6_read(st_ao_packet* pck)
 {
     // IPv6 header
     pck->m3.ipv6.hdr = NULL;
-    if (pck->m3_size >= sizeof(struct ipv6hdr)) {
+    if (pck->m3_size >= sizeof(struct libnet_ipv6_hdr)) {
     
         // Set type
         pck->m3_type = AO_M3_IPV6;
         
         // Header
-        pck->m3.ipv6.hdr = (struct ipv6hdr*)(pck->m3_data);
+        pck->m3.ipv6.hdr = (struct libnet_ipv6_hdr*)(pck->m3_data);
         
         // Data
-        pck->m4_data = pck->m3_data + sizeof(struct ipv6hdr);
-        pck->m4_size = pck->m3_size - sizeof(struct ipv6hdr);
+        pck->m4_data = pck->m3_data + sizeof(struct libnet_ipv6_hdr);
+        pck->m4_size = pck->m3_size - sizeof(struct libnet_ipv6_hdr);
         
         // Next layer
-        switch (pck->m3.ipv6.hdr->nexthdr) {
+        switch (pck->m3.ipv6.hdr->ip_nh) {
             case IPPROTO_TCP:
                 pck_tcp_read(pck);
                 break;
