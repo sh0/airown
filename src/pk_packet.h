@@ -92,7 +92,7 @@ struct t_ao_packet {
             st_tcp_timestamp* ts;
         } tcp;
         struct {
-            struct udphdr* hdr;
+            struct libnet_udp_hdr* hdr;
         } udp;
     } m4;
     guint32 m4_type;

@@ -175,8 +175,8 @@ void ao_pck_log(st_ao_packet* pck)
         }
     } else if ((pck->m4_type == AO_M4_UDP) && (dshow & AO_PROTO_L4_UDP)) {
         g_print("* udp! port_src=%hu, port_dst=%hu, checksum=0x%04x, len=%hu\n",
-            ntohs(pck->m4.udp.hdr->source), ntohs(pck->m4.udp.hdr->dest),
-            ntohs(pck->m4.udp.hdr->check), ntohs(pck->m4.udp.hdr->len)
+            ntohs(pck->m4.udp.hdr->uh_sport), ntohs(pck->m4.udp.hdr->uh_dport),
+            ntohs(pck->m4.udp.hdr->uh_sum), ntohs(pck->m4.udp.hdr->uh_ulen)
         );
     }
     if ((pck->m4_size > 0) && (

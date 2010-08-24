@@ -91,19 +91,19 @@ void pck_tcp_free(st_ao_packet* pck)
 
 void pck_udp_read(st_ao_packet* pck)
 {
-    if (pck->m4_size >= sizeof(struct udphdr)) {
+    if (pck->m4_size >= sizeof(struct libnet_udp_hdr)) {
         // Header
-        pck->m4.udp.hdr = (struct udphdr*) pck->m4_data;
+        pck->m4.udp.hdr = (struct libnet_udp_hdr*) pck->m4_data;
         
         // Lengths and offsets
-        guint16 udp_len = ntohs(pck->m4.udp.hdr->len);
+        guint16 udp_len = ntohs(pck->m4.udp.hdr->uh_ulen);
         if (udp_len > pck->m4_size) {
             return;
         }
         
         // Set payload
-        pck->pl_data = pck->m4_data + sizeof(struct udphdr);
-        pck->pl_size = udp_len - sizeof(struct udphdr);
+        pck->pl_data = pck->m4_data + sizeof(struct libnet_udp_hdr);
+        pck->pl_size = udp_len - sizeof(struct libnet_udp_hdr);
         
         // Set type
         pck->m4_type = AO_M4_UDP;
