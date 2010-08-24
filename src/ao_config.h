@@ -21,25 +21,8 @@
 #ifndef H_AO_CONFIG
 #define H_AO_CONFIG
 
-// Basic
-#include <stdint.h>
-#include <getopt.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <signal.h>
-
 // Glib
 #include <glib.h>
-
-// Unix if
-#include <sys/socket.h>
-#include <netinet/ip.h>
-#include <netinet/tcp.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <pthread.h>
-#include <time.h>
 
 // Lorcon
 #include <lorcon.h>
