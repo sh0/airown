@@ -88,11 +88,11 @@ struct t_ao_packet {
     // Layer 4
     union {
         struct {
-            struct tcphdr* hdr;
+            struct libnet_tcp_hdr* hdr;
             st_tcp_timestamp* ts;
         } tcp;
         struct {
-            struct udphdr* hdr;
+            struct libnet_udp_hdr* hdr;
         } udp;
     } m4;
     guint32 m4_type;
