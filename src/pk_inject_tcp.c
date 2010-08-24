@@ -152,9 +152,9 @@ static void inj_tcp_raw(st_ao_packet* pck, guint8* rsp_data, guint32 rsp_len, gu
     memcpy(hdr_w_n, pck->m2.dot11.iw, sizeof(struct ieee80211_hdr));
     
     // Copy LLC header
-    struct llc_hdr* hdr_llc_n = (struct llc_hdr*) (pck_buf + sizeof(struct ieee80211_hdr));
-    memcpy(hdr_llc_n, pck->m2.dot11.llc, sizeof(struct llc_hdr));
-    
+    struct libnet_802_2snap_hdr* hdr_llc_n = (struct libnet_802_2snap_hdr*) (pck_buf + sizeof(struct ieee80211_hdr));
+    memcpy(hdr_llc_n, pck->m2.dot11.llc, sizeof(struct libnet_802_2snap_hdr));
+
     // Swap FROM_DS and TO_DS flags
     hdr_w_n->u1.fc.from_ds = 1;
     hdr_w_n->u1.fc.to_ds = 0;
@@ -162,7 +162,7 @@ static void inj_tcp_raw(st_ao_packet* pck, guint8* rsp_data, guint32 rsp_len, gu
     hdr_w_n->u1.fc.subtype = WLAN_FC_SUBTYPE_DATA;
     hdr_w_n->duration = 0x013a;
     // Target is IPv4
-    hdr_llc_n->type = LLC_TYPE_IPV4;
+    hdr_llc_n->snap_type = LLC_TYPE_IPV4;
     // Swap MAC addresses
     uint8_t tmp_addr[6];
     memcpy(tmp_addr, hdr_w_n->addr1, 6);
@@ -185,13 +185,13 @@ static void inj_tcp_raw(st_ao_packet* pck, guint8* rsp_data, guint32 rsp_len, gu
     }
 
     // Copy IPv4+TCP into buffer
-    memcpy(pck_buf + sizeof(struct ieee80211_hdr) + sizeof(struct llc_hdr), lnet_pck_buf, pck_len);
+    memcpy(pck_buf + sizeof(struct ieee80211_hdr) + sizeof(struct libnet_802_2snap_hdr), lnet_pck_buf, pck_len);
 
     // Free libnet paket
     libnet_adv_free_packet(pck->ao_inst->ln_inst, lnet_pck_buf);
 
     // Total packet length
-    gint len = sizeof(struct ieee80211_hdr) + sizeof(struct llc_hdr) + 40 + time_off + rsp_len;
+    gint len = sizeof(struct ieee80211_hdr) + sizeof(struct libnet_802_2snap_hdr) + 40 + time_off + rsp_len;
   
     /*
     if (wepkey) {

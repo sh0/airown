@@ -25,17 +25,10 @@
 #include "ao_config.h"
 #include "ao_main.h"
 
-// LLC header
+/* ether types: http://standards.ieee.org/regauth/ethertype/eth.txt */
 #define LLC_TYPE_IPV4 0x0008
 #define LLC_TYPE_IPV6 0xDD86
 #define LLC_TYPE_ARP 0x0608
-struct llc_hdr {
-    uint8_t dsap;
-    uint8_t ssap;
-    uint8_t control_field;
-    uint8_t org_code[3];
-    uint16_t type;
-} __attribute__ ((packed));
 
 // TCP timestamp
 struct t_tcp_timestamp {
@@ -70,7 +63,7 @@ struct t_ao_packet {
     union {
         struct {
             struct ieee80211_hdr* iw;
-            struct llc_hdr* llc;
+            struct libnet_802_2snap_hdr* llc;
             guint8* addr4;
             struct ieee80211_qos* qos;
         } dot11;

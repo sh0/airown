@@ -117,10 +117,10 @@ void ao_pck_log(st_ao_packet* pck)
         }
         if (pck->m2.dot11.llc) {
             g_print("* llc! type=%u, is_ipv4=%u, is_ipv6=%u, is_arp=%u\n",
-                pck->m2.dot11.llc->type,
-                pck->m2.dot11.llc->type == LLC_TYPE_IPV4 ? 1 : 0,
-                pck->m2.dot11.llc->type == LLC_TYPE_IPV6 ? 1 : 0,
-                pck->m2.dot11.llc->type == LLC_TYPE_ARP ? 1 : 0
+                pck->m2.dot11.llc->snap_type,
+                pck->m2.dot11.llc->snap_type == LLC_TYPE_IPV4 ? 1 : 0,
+                pck->m2.dot11.llc->snap_type == LLC_TYPE_IPV6 ? 1 : 0,
+                pck->m2.dot11.llc->snap_type == LLC_TYPE_ARP ? 1 : 0
             );
         }
     }

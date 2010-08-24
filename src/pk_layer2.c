@@ -62,11 +62,11 @@ void pck_ieee80211_read(st_ao_packet* pck)
 	            hdr_offset += sizeof(struct ieee80211_qos);
 	        }
 	        
-	        // LLC
+	        // LLC/SNAP handling
 	        pck->m2.dot11.llc = NULL;
-	        if (pck->m2_size >= hdr_offset + sizeof(struct llc_hdr)) {
-	            pck->m2.dot11.llc = (struct llc_hdr*)(pck->m2_data + hdr_offset);
-	            hdr_offset += sizeof(struct llc_hdr);
+	        if (pck->m2_size >= hdr_offset + sizeof(struct libnet_802_2snap_hdr)) {
+	            pck->m2.dot11.llc = (struct libnet_802_2snap_hdr*)(pck->m2_data + hdr_offset);
+	            hdr_offset += sizeof(struct libnet_802_2snap_hdr);
 	        }
 	        
 	        // Next layer
@@ -77,7 +77,7 @@ void pck_ieee80211_read(st_ao_packet* pck)
 	            pck->m3_size = pck->m2_size - hdr_offset;
 	        
 	            // Process
-	            switch (pck->m2.dot11.llc->type) {
+	            switch (pck->m2.dot11.llc->snap_type) {
 	                case LLC_TYPE_IPV4:
 	                    pck_ipv4_read(pck);
 	                    break;
