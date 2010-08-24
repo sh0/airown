@@ -32,9 +32,9 @@ void pck_tcp_read(st_ao_packet* pck)
         // Lengths and offsets
         guint16 tcp_len = 0;
         if (pck->m3_type == AO_M3_IPV4) {
-            tcp_len = ntohs(pck->m3.ipv4.hdr->tot_len) - (pck->m3.ipv4.hdr->ihl * 4) - (pck->m4.tcp.hdr->doff * 4);
+            tcp_len = ntohs(pck->m3.ipv4.hdr->ip_len) - (pck->m3.ipv4.hdr->ip_hl * 4) - (pck->m4.tcp.hdr->doff * 4);
         } else if (pck->m3_type == AO_M3_IPV6) {
-            tcp_len = ntohs(pck->m3.ipv4.hdr->tot_len) - sizeof(struct libnet_ipv6_hdr) - (pck->m4.tcp.hdr->doff * 4);
+            tcp_len = ntohs(pck->m3.ipv4.hdr->ip_len) - sizeof(struct libnet_ipv6_hdr) - (pck->m4.tcp.hdr->doff * 4);
         } else {
             return;
         }

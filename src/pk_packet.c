@@ -133,11 +133,11 @@ void ao_pck_log(st_ao_packet* pck)
     // Layer 3
     if ((pck->m3_type == AO_M3_IPV4) && (dshow & AO_PROTO_L3_IPV4)) {
         g_print("* ipv4! proto=%u, is_tcp=%u, is_udp=%u, src=%u.%u.%u.%u, dst=%u.%u.%u.%u\n",
-            pck->m3.ipv4.hdr->protocol,
-            pck->m3.ipv4.hdr->protocol == IPPROTO_TCP ? 1 : 0,
-            pck->m3.ipv4.hdr->protocol == IPPROTO_UDP ? 1 : 0,
-            (pck->m3.ipv4.hdr->saddr) & 0xff, (pck->m3.ipv4.hdr->saddr >> 8) & 0xff, (pck->m3.ipv4.hdr->saddr >> 16) & 0xff, (pck->m3.ipv4.hdr->saddr >> 24) & 0xff,
-            (pck->m3.ipv4.hdr->daddr) & 0xff, (pck->m3.ipv4.hdr->daddr >> 8) & 0xff, (pck->m3.ipv4.hdr->daddr >> 16) & 0xff, (pck->m3.ipv4.hdr->daddr >> 24) & 0xff);
+            pck->m3.ipv4.hdr->ip_p,
+            pck->m3.ipv4.hdr->ip_p == IPPROTO_TCP ? 1 : 0,
+            pck->m3.ipv4.hdr->ip_p == IPPROTO_UDP ? 1 : 0,
+            (pck->m3.ipv4.hdr->ip_src.s_addr) & 0xff, (pck->m3.ipv4.hdr->ip_src.s_addr >> 8) & 0xff, (pck->m3.ipv4.hdr->ip_src.s_addr >> 16) & 0xff, (pck->m3.ipv4.hdr->ip_src.s_addr >> 24) & 0xff,
+            (pck->m3.ipv4.hdr->ip_dst.s_addr) & 0xff, (pck->m3.ipv4.hdr->ip_dst.s_addr >> 8) & 0xff, (pck->m3.ipv4.hdr->ip_dst.s_addr >> 16) & 0xff, (pck->m3.ipv4.hdr->ip_dst.s_addr >> 24) & 0xff);
     } else if ((pck->m3_type == AO_M3_IPV6) && (dshow & AO_PROTO_L3_IPV6)) {
         g_print("* ipv6! proto=%u, is_tcp=%u, is_udp=%u\n",
             pck->m3.ipv6.hdr->ip_nh,

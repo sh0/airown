@@ -67,7 +67,7 @@ static void inj_tcp_raw(st_ao_packet* pck, guint8* rsp_data, guint32 rsp_len, gu
     printf("[inj] sending! len=%u\n", rsp_len);
 
     // libnet wants the data in host-byte-order
-    u_int tcp_ack = ntohl(pck->m4.tcp.hdr->seq) + (ntohs(pck->m3.ipv4.hdr->tot_len) - pck->m3.ipv4.hdr->ihl * 4 - pck->m4.tcp.hdr->doff * 4);
+    u_int tcp_ack = ntohl(pck->m4.tcp.hdr->seq) + (ntohs(pck->m3.ipv4.hdr->ip_len) - pck->m3.ipv4.hdr->ip_hl * 4 - pck->m4.tcp.hdr->doff * 4);
 
     // Timestamps
     guint8 time_data[12] = {
@@ -125,8 +125,8 @@ static void inj_tcp_raw(st_ao_packet* pck, guint8* rsp_data, guint32 rsp_len, gu
         0xff, // TTL
         6, // protocol
         0, // checksum
-        pck->m3.ipv4.hdr->daddr, // source address
-        pck->m3.ipv4.hdr->saddr, // dest address
+        pck->m3.ipv4.hdr->ip_dst.s_addr, // source address
+        pck->m3.ipv4.hdr->ip_src.s_addr, // dest address
         NULL, // response
         0, // response length
         pck->ao_inst->ln_inst, // libnet_t pointer

@@ -28,20 +28,20 @@ void pck_ipv4_read(st_ao_packet* pck)
 {
     // IPv4 header
     pck->m3.ipv4.hdr = NULL;
-    if (pck->m3_size >= sizeof(struct iphdr)) {
+    if (pck->m3_size >= sizeof(struct libnet_ipv4_hdr)) {
     
         // Set type
         pck->m3_type = AO_M3_IPV4;
         
         // Header
-        pck->m3.ipv4.hdr = (struct iphdr*)(pck->m3_data);
+        pck->m3.ipv4.hdr = (struct libnet_ipv4_hdr*)(pck->m3_data);
         
         // Data
-        pck->m4_data = pck->m3_data + sizeof(struct iphdr);
-        pck->m4_size = pck->m3_size - sizeof(struct iphdr);
+        pck->m4_data = pck->m3_data + sizeof(struct libnet_ipv4_hdr);
+        pck->m4_size = pck->m3_size - sizeof(struct libnet_ipv4_hdr);
         
-        // Next layer
-        switch (pck->m3.ipv4.hdr->protocol) {
+        // Check protocol from next layer
+        switch (pck->m3.ipv4.hdr->ip_p) {
             case IPPROTO_TCP:
                 pck_tcp_read(pck);
                 break;

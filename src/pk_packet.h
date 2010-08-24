@@ -82,7 +82,7 @@ struct t_ao_packet {
     // Layer 3
     union {
         struct {
-            struct iphdr* hdr;
+            struct libnet_ipv4_hdr* hdr;
         } ipv4;
         struct {
             struct libnet_ipv6_hdr* hdr;
