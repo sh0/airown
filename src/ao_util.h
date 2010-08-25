@@ -26,6 +26,8 @@
 
 // Hex dump
 void dumphex(guint8* data, guint32 len);
+void dumphex_file(FILE* file, guint8* data, guint32 len);
+void dumphex_c(guint8* data, guint32 len);
 
 // Compare addresses
 gboolean cmp_ipv4(struct in_addr* a, struct in_addr* b);
@@ -40,3 +42,4 @@ void cpy_ipv4(struct in_addr* dst, struct in_addr* src);
 void cpy_ipv6(struct libnet_in6_addr* dst, struct libnet_in6_addr* src);
 
 #endif
+

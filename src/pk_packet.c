@@ -175,6 +175,7 @@ void ao_pck_log(st_ao_packet* pck)
         if (pck->m4.tcp.ts) {
             g_print("* tcp! time_a=0x%08x, time_b=0x%08x\n", ntohl(pck->m4.tcp.ts->time_a), ntohl(pck->m4.tcp.ts->time_b));
         }
+        //dumphex_c(pck->m2_data, pck->m2_size);
     } else if ((pck->m4_type == AO_M4_UDP) && (dshow & AO_PROTO_L4_UDP)) {
         g_print("* udp! port_src=%hu, port_dst=%hu, checksum=0x%04x, len=%hu\n",
             ntohs(pck->m4.udp.hdr->uh_sport), ntohs(pck->m4.udp.hdr->uh_dport),

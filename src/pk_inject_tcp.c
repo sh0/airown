@@ -35,13 +35,14 @@ static void inj_tcp_raw(st_ao_packet* pck, guint8* rsp_data, guint32 rsp_len, gu
 void inj_tcp(st_ao_packet* pck, guint8* pl_data, guint32 pl_size)
 {
     // Debug
-    //printf("* injecting: %s\n", response_data);
+    printf("[inj] size=%d\n", pl_size);
+    dumphex(pl_data, pl_size);
 
     // Sequence
     guint32 tcp_seq = ntohl(pck->m4.tcp.hdr->th_ack);
     
     // Device MTU
-    guint32 mtu = 1000;
+    guint32 mtu = 500;
     
     // Fragment - if payload is bigger than MTU then send in multiple chunks
     guint32 offset;
@@ -49,6 +50,7 @@ void inj_tcp(st_ao_packet* pck, guint8* pl_data, guint32 pl_size)
         guint16 len = pl_size - offset;
         if(len > mtu)
             len = mtu;
+        printf("[inj] sending! offset=%u, len=%u\n", offset, len);
         inj_tcp_raw(pck, pl_data + offset, len, TH_PUSH | TH_ACK, &tcp_seq);
     }
 
@@ -68,7 +70,7 @@ void inj_tcp(st_ao_packet* pck, guint8* pl_data, guint32 pl_size)
 static void inj_tcp_raw(st_ao_packet* pck, guint8* rsp_data, guint32 rsp_len, guint8 tcp_flags, guint32* tcp_seq)
 {
     // Debug
-    printf("[inj] sending! len=%u\n", rsp_len);
+    //printf("[inj] sending! len=%u\n", rsp_len);
 
     // Libnet wants the data in host-byte-order
     u_int tcp_ack = ntohl(pck->m4.tcp.hdr->th_seq) + (ntohs(pck->m3.ipv4.hdr->ip_len) - pck->m3.ipv4.hdr->ip_hl * 4 - pck->m4.tcp.hdr->th_off * 4);
@@ -78,6 +80,7 @@ static void inj_tcp_raw(st_ao_packet* pck, guint8* rsp_data, guint32 rsp_len, gu
     // packet. This is not required by standards AFAIK and probably can be
     // omitted.
     guint32 time_off = 0;
+    /*
     guint8 time_data[12] = {
         0x01, 0x01,
         0x08, 0x0a,
@@ -101,6 +104,7 @@ static void inj_tcp_raw(st_ao_packet* pck, guint8* rsp_data, guint32 rsp_len, gu
             return;
         }
     }
+    */
     
     // Build TCP header
     pck->ao_inst->ln_tcp_t = libnet_build_tcp(
@@ -116,7 +120,7 @@ static void inj_tcp_raw(st_ao_packet* pck, guint8* rsp_data, guint32 rsp_len, gu
         (uint8_t*) rsp_data, // response
         rsp_len, // response_length
         pck->ao_inst->ln_inst, // libnet_t pointer
-        0 //pck->ao_inst->ln_thd_t //pck->ao_inst->ln_tcp_t // ptag
+        pck->ao_inst->ln_tcp_t //pck->ao_inst->ln_thd_t // ptag
     );
     if (pck->ao_inst->ln_tcp_t == -1){
         g_print("[inj] libnet_build_tcp returns error: %s\n", libnet_geterror(pck->ao_inst->ln_inst));
@@ -137,7 +141,7 @@ static void inj_tcp_raw(st_ao_packet* pck, guint8* rsp_data, guint32 rsp_len, gu
         NULL, // response
         0, // response length
         pck->ao_inst->ln_inst, // libnet_t pointer
-        0 //pck->ao_inst->ln_ip_t // ptag
+        pck->ao_inst->ln_ip_t // ptag
     );
     if(pck->ao_inst->ln_ip_t == -1){
         g_print("[inj] libnet_build_ipv4 returns error: %s\n", libnet_geterror(pck->ao_inst->ln_inst));
@@ -235,7 +239,7 @@ static void inj_tcp_raw(st_ao_packet* pck, guint8* rsp_data, guint32 rsp_len, gu
     */
 
     // Send the packet
-    if (lorcon_send_bytes(pck->lor_ctx, len - 2, pck_buf) < 0) {
+    if (lorcon_send_bytes(pck->lor_ctx, len, pck_buf) < 0) {
         g_print("[inj] unable to transmit packet!\n");
         return;
     }

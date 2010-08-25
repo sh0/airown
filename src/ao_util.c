@@ -60,6 +60,53 @@ void dumphex(guint8* data, guint32 len)
 	}
 }
 
+void dumphex_file(FILE* file, guint8* data, guint32 len)
+{
+	uint32_t i;
+
+	uint32_t done = 0;
+	while (len > done) {
+
+		// Hex
+		uint32_t cur = 0;
+		fprintf(file, "| ");
+		while ((cur < 16) && (len >= done + cur)) {
+			fprintf(file, "%02x ", data[done + cur]);
+			cur++;
+		}
+		for (i = 0; i < (16-cur); i++)
+			fprintf(file, "   ");
+
+		// String
+		fprintf(file, "| ");
+		cur = 0;
+		while ((cur < 16) && (len >= done + cur)) {
+			char ch = data[done + cur];			
+			if ((ch >= 32) && (ch <= 126))
+				fprintf(file, "%c", data[done + cur]);
+			else
+				fprintf(file, ".");			
+			cur++;
+		}
+		for (i = 0; i < (16-cur); i++)
+			fprintf(file, " ");
+		fprintf(file, " |\n");
+
+		// Next
+		done += cur;
+	}
+}
+
+void dumphex_c(guint8* data, guint32 len)
+{
+    printf("guint8 data[] = { ");
+    guint i;
+    for (i=0; i<len - 1; i++) {
+        printf("0x%02x, ", data[i]);
+    }
+    printf("0x%02x };\n", data[len - 1]);
+}
+
 // Compare addresses
 gboolean cmp_ipv4(struct in_addr* a, struct in_addr* b)
 {
