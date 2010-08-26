@@ -66,6 +66,12 @@ int main(int argc, char* argv[]) {
     ao_inst.ln_thd_t = 0;
     ao_inst.ln_ip_t = 0;
     
+	ao_inst.mtu = 0;
+	
+	ao_inst.wep_enabled = FALSE;
+	ao_inst.wep_key_data = NULL;
+	ao_inst.wep_key_size = 0;
+    
     ao_inst.cmd_iface = "wlan0";
     ao_inst.cmd_driver = NULL;
     ao_inst.cmd_drvlist = FALSE;
@@ -257,6 +263,26 @@ int main(int argc, char* argv[]) {
 		g_print("[sys] failed to create context for %s %s!\n", ao_inst.cmd_iface, dri->name);
 		exit(1);
 	}
+	
+	// Get MTU
+	gint rsock = socket(AF_INET, SOCK_DGRAM, 0);
+    if (rsock < 0) {
+        perror("[drv] unable to create temporary socket! error");
+        exit(1);
+    }
+	
+	struct ifreq ifr;
+    memset(&ifr, 0, sizeof(ifr));
+    strncpy(ifr.ifr_name, ao_inst.cmd_iface, IF_NAMESIZE);
+    if ((ioctl(rsock, SIOCGIFMTU, &ifr)) == -1) {
+        perror("[drv] unable to get interface mtu! error");
+        exit(1);
+    } else {
+        ao_inst.mtu = ifr.ifr_mtu;
+        g_print("[drv] got mtu value! mtu=%u\n", ao_inst.mtu);
+    }
+    
+    close(rsock);
 
     // Open lorcon context
 	if (lorcon_open_injmon(ao_inst.lor_ctx) < 0) {

@@ -1,7 +1,7 @@
 /*
- * Airown - config
+ * Airown - WEP encryption
  *
- * Copyright (C) 2010 sh0 <sh0@yutani.ee>
+ * Copyright (C) 2006 toast
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,24 +18,43 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef H_AO_CONFIG
-#define H_AO_CONFIG
-
-// Glib
-#include <glib.h>
-
-// Lorcon
-#include <lorcon.h>
-#include <lorcon_ieee80211.h>
-#include <lorcon_packasm.h>
-#include <lorcon_forge.h>
-
-// Libnet
-#include <libnet.h>
-#include <pcap.h>
+#ifndef H_WEP_MAIN
+#define H_WEP_MAIN
 
 // Int inc
-#include "ao_cmake.h"
+#include "ao_config.h"
+
+// Misc macros
+#define IS_WEP(flags) ((flags) & 0x40)
+#define WEPSMALLKEYSIZE 5
+#define WEPLARGEKEYSIZE 13
+
+/*
+struct wepkey {
+    guint8 key[WEPLARGEKEYSIZE];
+    guint32 keylen;
+    struct wepkey *next;
+};
+typedef struct wepkey wepkey;
+*/
+
+// Decrypt
+gint32 wep_decrypt(
+    const guint8* src,
+    guint8* dst,
+    guint32 len,
+    const guint8* wepkey,
+    guint32 keylen
+);
+
+// Encrypt
+gint32 wep_encrypt(
+    const guint8* src,
+    guint8* dst,
+    guint32 len,
+    const guint8* wepkey,
+    guint32 keylen
+);
 
 #endif
 
