@@ -32,6 +32,7 @@ OPTION(VERBOSE "Verbose cmake output" OFF)
 INCLUDE(airown-helpers)
 INCLUDE(airown-libs-general)
 INCLUDE(airown-libs-glib)
+INCLUDE(airown-libs-openssl)
 INCLUDE(airown-libs-lorcon)
 INCLUDE(airown-libs-libnet)
 

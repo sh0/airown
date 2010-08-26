@@ -1,10 +1,14 @@
 /*
- * Copyright (C) 2006 toast
+ * Airown - WEP encryption/decryption
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * Copyright (C) 2006 toast
+ * Copyright (C) 2010 sh0 <sh0@yutani.ee> - cosmetic changes
+ * This file involves heavy borrowing from ethereal's WEP code
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,25 +17,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.
- *
- *
- * This file involves heavy borrowing from ethereal's WEP code
- *
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 // Int inc
 #include "ao_config.h"
 #include "wep_main.h"
-
-/*
-#include <string.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdio.h>
-*/
 
 // Macros
 #define SSWAP(a,b) {uint8_t tmp = s[a]; s[a] = s[b]; s[b] = tmp;}
@@ -94,8 +85,9 @@ const guint32 crc32_ccitt_table[256] = {
 
 /**
  * \brief Initializes the s-boxes for RC4 encryption/deceryption
+ * \ingroup wep
  */
-void rc4_init(guint8 *s, const guint8 *key, guint32 keylen)
+static void rc4_init(guint8* s, const guint8* key, guint32 keylen)
 {
     uint32_t i, j;
 
@@ -117,6 +109,7 @@ void rc4_init(guint8 *s, const guint8 *key, guint32 keylen)
  * \param wepkey The key to use for en/decryption
  * \param keylen The length of the key in bytes
  * \param encrypt TRUE to perform encryption, FALSE to perform decryption
+ * \ingroup wep
  */
 gint32 do_wep(
     const guint8* src,
@@ -224,6 +217,7 @@ gint32 do_wep(
  * \param wepkey WEP key data
  * \param weplen WEP key size
  * \return Size of encrypted data or <= 0 on error
+ * \ingroup wep
  */
 gint32 wep_decrypt(
     const guint8* src,
@@ -242,6 +236,7 @@ gint32 wep_decrypt(
  * \param wepkey WEP key data
  * \param weplen WEP key size
  * \return Size of encrypted data or <= 0 on error
+ * \ingroup wep
  */
 gint32 wep_encrypt(
     const guint8* src,

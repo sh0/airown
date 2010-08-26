@@ -33,7 +33,7 @@ static gboolean inj_tcp_raw(
     guint32* tcp_seq
 );
 
-#define TCP_TIMESTAMP_ENABLE
+//#define TCP_TIMESTAMP_ENABLE
 
 /**
  * \brief Inject data into TCP stream.

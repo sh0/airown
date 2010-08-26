@@ -1,0 +1,42 @@
+//
+// Airown config
+//
+
+{
+    // List of payloads
+    [ {
+        // General
+        "name" : "http-all",
+        "protocol" : "http",
+        // Trigger
+        "trigger" : {
+            "host" : "*",
+            "request" : "/",
+            "ip" : "192.168.1.2",
+            "port" : 80
+        },
+        // Payload
+        "payload" : {
+            "redirect" : "http://google.ee", // use redirecting
+            "headers" : [ // custom headers
+                "Content-Type: text/html; charset=utf-8"
+            ],
+            "data-length" : true, // automatic Content-Length calculation
+            "data-text" : "OWNED!", // simple text payload
+            "data-file" : "http-payload.htm" // payload from file
+        }
+    }, {
+        // General
+        "name" : "dns-all",
+        "protocol" "dns",
+        // Trigger
+        "trigger" : {
+            "host" : "*"
+        },
+        // Payload
+        "payload" : {
+            "ip" : "192.168.1.2"
+        }
+    } ]
+}
+

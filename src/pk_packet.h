@@ -25,7 +25,7 @@
 #include "ao_config.h"
 #include "ao_main.h"
 
-/* ether types: http://standards.ieee.org/regauth/ethertype/eth.txt */
+// Ether types: http://standards.ieee.org/regauth/ethertype/eth.txt
 #define LLC_TYPE_IPV4 0x0008
 #define LLC_TYPE_IPV6 0xDD86
 #define LLC_TYPE_ARP 0x0608
