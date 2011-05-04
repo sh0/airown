@@ -62,7 +62,11 @@ struct t_ao_packet {
     // Layer 2
     union {
         struct {
+            // IEEE 802.11
             struct ieee80211_hdr* iw;
+            // Management frame
+            struct ieee80211_mgmt* mgmt;
+            // Data frame
             struct libnet_802_2snap_hdr* llc;
             guint8* addr4;
             struct ieee80211_qos* qos;

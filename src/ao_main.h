@@ -45,10 +45,12 @@ struct t_ao_inst {
     libnet_ptag_t ln_ip_t; // = 0; // IMPORTANT!
     // Interface
     guint32 mtu; // = 0;
+    
     // WEP
     gboolean wep_enabled; // = FALSE;
     guint8* wep_key_data; // = NULL;
     guint32 wep_key_size; // = 0;
+    
     // Command line (main)
     gchar* cmd_iface; // = "wlan0";
     gchar* cmd_driver; // = NULL;
