@@ -6,13 +6,20 @@ IF (NOT LORCON_CHECKED)
 
     # Messages
     MESSAGE(STATUS "################################################")
-    MESSAGE(STATUS "Checking for LORCON")
+    MESSAGE(STATUS "Checking for LORCON (liborcon)")
 
     # Find
-    #PKG_CHECK_MODULES(LORCON lorcon)
-    SET(LORCON_FOUND 1)
-    SET(LORCON_CFLAGS "-I/usr/include/lorcon2")
-    SET(LORCON_LDFLAGS "-lorcon2")
+    FIND_PATH(LORCON_INCLUDE_DIR NAMES lorcon.h PATH_SUFFIXES lorcon lorcon2)
+    FIND_LIBRARY(LORCON_LIBRARY NAMES orcon2)
+
+    # Result
+    IF (LORCON_INCLUDE_DIR AND LORCON_LIBRARY)
+        SET(LORCON_FOUND 1)
+    ENDIF (LORCON_INCLUDE_DIR AND LORCON_LIBRARY)
+    
+    # Compiler
+    SET(LORCON_CFLAGS "-I${LORCON_INCLUDE_DIR}")
+    SET(LORCON_LDFLAGS "${LORCON_LIBRARY}")
     PRINT_LIBRARY_INFO("LORCON" LORCON_FOUND "${LORCON_CFLAGS}" "${LORCON_LDFLAGS}" FATAL_ERROR)
 
     # Set as checked

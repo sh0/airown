@@ -1,7 +1,7 @@
 /*
- * Airown - Driver - Lorcon
+ * Airown - Driver - 802.11 netlink
  *
- * Copyright (C) 2010-2011 sh0 <sh0@yutani.ee>
+ * Copyright (C) 2011 sh0 <sh0@yutani.ee>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,32 +18,23 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef H_DRV_LORCON
-#define H_DRV_LORCON
+#ifndef H_DRV_NL
+#define H_DRV_NL
 
 // Int inc
 #include "ao_config.h"
 #include "drv_main.h"
+#include "pck_main.h"
 
 // Enable check
-#ifdef LORCON_FOUND
-
-// Ext inc
-#define protected protected_c
-extern "C" {
-#include <lorcon.h>
-#include <lorcon_ieee80211.h>
-#include <lorcon_packasm.h>
-#include <lorcon_forge.h>
-}
-#undef protected
+#ifdef NETLINK_FOUND
 
 // Driver class
-class c_drv_lorcon : public c_drv {
+class c_drv_netlink : public c_drv {
     public:
         // Constructor and destructor
-        c_drv_lorcon(const gchar* dev, const gchar* drv, guint chan);
-        ~c_drv_lorcon();
+        c_drv_netlink(const gchar* dev);
+        ~c_drv_netlink();
         
         // Init and end
         bool init();
@@ -66,9 +57,8 @@ class c_drv_lorcon : public c_drv {
         gchar* m_info_drv;
         guint m_info_chan;
         
-        // Lorcon
-        lorcon_t* m_lorcon;
-        lorcon_driver_t* m_driver;
+        // Netlink
+        
         guint m_mtu;
         gint m_chan;
         
@@ -88,6 +78,6 @@ class c_drv_lorcon : public c_drv {
         static void f_delete_pck(gpointer data);
 };
 
-#endif // LORCON_FOUND
-#endif // H_DRV_LORCON
+#endif // NETLINK_FOUND
+#endif // H_DRV_NL
 

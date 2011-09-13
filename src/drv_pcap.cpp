@@ -22,6 +22,9 @@
 #include "ao_config.h"
 #include "drv_pcap.h"
 
+// Enable check
+#ifdef PCAP_FOUND
+
 // Constructor and destructor
 c_drv_pcap::c_drv_pcap(const gchar* dev_rx, guint mode_rx, const gchar* dev_tx, guint mode_tx)
 {
@@ -382,4 +385,6 @@ void c_drv_pcap::f_delete_pck(gpointer data)
     g_byte_array_unref(pck->data);
     g_free(pck);
 }
+
+#endif
 

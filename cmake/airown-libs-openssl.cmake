@@ -6,7 +6,7 @@ IF (NOT OPENSSL_CHECKED)
 
     # Messages
     MESSAGE(STATUS "################################################")
-    MESSAGE(STATUS "Checking for OpenSSL")
+    MESSAGE(STATUS "Checking for OPENSSL")
 
     # Find
     PKG_CHECK_MODULES(OPENSSL openssl)

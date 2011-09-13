@@ -69,85 +69,137 @@ bool c_context::init(
     
     // RX driver and mode
     if (!g_strcmp0(conf_drv_rx, "pcap")) {
-        m_rx_type = DRIVER_PCAP;
-        if (!g_strcmp0(conf_mode_rx, "file")) {
-            m_rx_mode = PCAP_MODE_FILE;
-        } else if (!g_strcmp0(conf_mode_rx, "dev")) {
-            m_rx_mode = PCAP_MODE_DEV;
-        } else {
-            g_critical("[sys] driver pcap does not support rx mode %s, please use either \"file\" or \"dev\"!", conf_mode_rx);
+        #ifdef PCAP_FOUND
+            m_rx_type = DRIVER_PCAP;
+            if (!g_strcmp0(conf_mode_rx, "file")) {
+                m_rx_mode = PCAP_MODE_FILE;
+            } else if (!g_strcmp0(conf_mode_rx, "dev")) {
+                m_rx_mode = PCAP_MODE_DEV;
+            } else {
+                g_critical("[sys] driver pcap does not support rx mode %s, please use either \"file\" or \"dev\"!", conf_mode_rx);
+                goto err_drv_find;
+            }
+        #else
+            g_critical("[sys] pcap driver not enabled in this build, choose another driver or rebuild airown!");
             goto err_drv_find;
-        }
+        #endif
     } else if (!g_strcmp0(conf_drv_rx, "lorcon")) {
-        m_rx_type = DRIVER_LORCON;
-        if (g_strcmp0(conf_mode_rx, "dev")) {
-            g_critical("[sys] driver lorcon does not support rx mode %s, please use \"dev\"!", conf_mode_rx);
+        #ifdef LORCON_FOUND
+            m_rx_type = DRIVER_LORCON;
+            if (g_strcmp0(conf_mode_rx, "dev")) {
+                g_critical("[sys] driver lorcon does not support rx mode %s, please use \"dev\"!", conf_mode_rx);
+                goto err_drv_find;
+            }
+        #else
+            g_critical("[sys] lorcon driver not enabled in this build, choose another driver or rebuild airown!");
             goto err_drv_find;
-        }
+        #endif
+    } else if (!g_strcmp0(conf_drv_rx, "netlink")) {
+        #ifdef NETLINK_FOUND
+            m_rx_type = DRIVER_NETLINK;
+            if (g_strcmp0(conf_mode_rx, "dev")) {
+                g_critical("[sys] driver netlink does not support rx mode %s, please use \"dev\"!", conf_mode_rx);
+                goto err_drv_find;
+            }
+        #else
+            g_critical("[sys] netlink driver not enabled in this build, choose another driver or rebuild airown!");
+            goto err_drv_find;
+        #endif
     }
     
     // TX driver and mode
     if (!g_strcmp0(conf_drv_tx, "pcap")) {
-        m_tx_type = DRIVER_PCAP;
-        if (!g_strcmp0(conf_mode_tx, "file")) {
-            m_tx_mode = PCAP_MODE_FILE;
-        } else {
-            g_critical("[sys] driver pcap does not support tx mode %s, please use \"file\"!", conf_mode_tx);
+        #ifdef PCAP_FOUND
+            m_tx_type = DRIVER_PCAP;
+            if (!g_strcmp0(conf_mode_tx, "file")) {
+                m_tx_mode = PCAP_MODE_FILE;
+            } else {
+                g_critical("[sys] driver pcap does not support tx mode %s, please use \"file\"!", conf_mode_tx);
+                goto err_drv_find;
+            }
+        #else
+            g_critical("[sys] pcap driver not enabled in this build, choose another driver or rebuild airown!");
             goto err_drv_find;
-        }
+        #endif
     } else if (!g_strcmp0(conf_drv_tx, "lorcon")) {
-        m_tx_type = DRIVER_LORCON;
-        if (g_strcmp0(conf_mode_tx, "dev")) {
-            g_critical("[sys] driver lorcon does not support tx mode %s, please use \"dev\"!", conf_mode_tx);
+        #ifdef LORCON_FOUND
+            m_tx_type = DRIVER_LORCON;
+            if (g_strcmp0(conf_mode_tx, "dev")) {
+                g_critical("[sys] driver lorcon does not support tx mode %s, please use \"dev\"!", conf_mode_tx);
+                goto err_drv_find;
+            }
+        #else
+            g_critical("[sys] lorcon driver not enabled in this build, choose another driver or rebuild airown!");
             goto err_drv_find;
-        }
+        #endif
+    } else if (!g_strcmp0(conf_drv_tx, "netlink")) {
+        #ifdef NETLINK_FOUND
+            m_tx_type = DRIVER_NETLINK;
+            if (g_strcmp0(conf_mode_tx, "dev")) {
+                g_critical("[sys] driver netlink does not support tx mode %s, please use \"dev\"!", conf_mode_tx);
+                goto err_drv_find;
+            }
+        #else
+            g_critical("[sys] netlink driver not enabled in this build, choose another driver or rebuild airown!");
+            goto err_drv_find;
+        #endif
     }
     
     // Check drivers
     if (m_rx_type == DRIVER_NONE && m_tx_type == DRIVER_NONE) {
-        g_critical("[sys] unable to find capture driver %s! please use either pcap or lorcon!", conf_drv_rx);
+        g_critical("[sys] no specified rx or tx drivers found! rx_drv=%s, tx_drv=%s", conf_drv_rx, conf_drv_tx);
         goto err_drv_find;
     }
     
     // Pcap
-    if (m_rx_type == DRIVER_PCAP || m_tx_type == DRIVER_PCAP) {
-        if (m_rx_type == DRIVER_PCAP && m_tx_type == DRIVER_PCAP) {
-            m_tx_drv = m_rx_drv = new c_drv_pcap(conf_dev_rx, m_rx_mode, conf_dev_tx, m_tx_mode);
-            if (!m_rx_drv->init())
-                goto err_drv_init;
-        } else if (m_rx_type == DRIVER_PCAP) {
-            m_rx_drv = new c_drv_pcap(conf_dev_rx, m_rx_mode, conf_dev_tx, m_tx_mode);
-            if (!m_rx_drv->init())
-                goto err_drv_init;
-        } else if (m_tx_type == DRIVER_PCAP) {
-            m_tx_drv = new c_drv_pcap(conf_dev_rx, m_rx_mode, conf_dev_tx, m_tx_mode);
-            if (!m_tx_drv->init())
-                goto err_drv_init;
+    #ifdef PCAP_FOUND
+        if (m_rx_type == DRIVER_PCAP || m_tx_type == DRIVER_PCAP) {
+            if (m_rx_type == DRIVER_PCAP && m_tx_type == DRIVER_PCAP) {
+                m_tx_drv = m_rx_drv = new c_drv_pcap(conf_dev_rx, m_rx_mode, conf_dev_tx, m_tx_mode);
+                if (!m_rx_drv->init())
+                    goto err_drv_init;
+            } else if (m_rx_type == DRIVER_PCAP) {
+                m_rx_drv = new c_drv_pcap(conf_dev_rx, m_rx_mode, conf_dev_tx, m_tx_mode);
+                if (!m_rx_drv->init())
+                    goto err_drv_init;
+            } else if (m_tx_type == DRIVER_PCAP) {
+                m_tx_drv = new c_drv_pcap(conf_dev_rx, m_rx_mode, conf_dev_tx, m_tx_mode);
+                if (!m_tx_drv->init())
+                    goto err_drv_init;
+            }
         }
-    }
+    #endif
     
-    if (m_rx_type == DRIVER_LORCON || m_tx_type == DRIVER_LORCON) {
-        if (m_rx_type == DRIVER_LORCON && m_tx_type == DRIVER_LORCON && !g_strcmp0(conf_dev_rx, conf_dev_tx)) {
-            m_tx_drv = m_rx_drv = new c_drv_lorcon(conf_dev_rx, NULL, 0);
-            if (!m_rx_drv->init())
-                goto err_drv_init;
-        } else if (m_rx_type == DRIVER_LORCON && m_tx_type == DRIVER_LORCON) {
-            m_rx_drv = new c_drv_lorcon(conf_dev_rx, NULL, 0);
-            if (!m_rx_drv->init())
-                goto err_drv_init;
-            m_tx_drv = new c_drv_lorcon(conf_dev_tx, NULL, 0);
-            if (!m_tx_drv->init())
-                goto err_drv_init;
-        } else if (m_rx_type == DRIVER_LORCON) {
-            m_rx_drv = new c_drv_lorcon(conf_dev_rx, NULL, 0);
-            if (!m_rx_drv->init())
-                goto err_drv_init;
-        } else if (m_tx_type == DRIVER_LORCON) {
-            m_tx_drv = new c_drv_lorcon(conf_dev_tx, NULL, 0);
-            if (!m_tx_drv->init())
-                goto err_drv_init;
+    // Lorcon
+    #ifdef LORCON_FOUND
+        if (m_rx_type == DRIVER_LORCON || m_tx_type == DRIVER_LORCON) {
+            if (m_rx_type == DRIVER_LORCON && m_tx_type == DRIVER_LORCON && !g_strcmp0(conf_dev_rx, conf_dev_tx)) {
+                m_tx_drv = m_rx_drv = new c_drv_lorcon(conf_dev_rx, NULL, 0);
+                if (!m_rx_drv->init())
+                    goto err_drv_init;
+            } else if (m_rx_type == DRIVER_LORCON && m_tx_type == DRIVER_LORCON) {
+                m_rx_drv = new c_drv_lorcon(conf_dev_rx, NULL, 0);
+                if (!m_rx_drv->init())
+                    goto err_drv_init;
+                m_tx_drv = new c_drv_lorcon(conf_dev_tx, NULL, 0);
+                if (!m_tx_drv->init())
+                    goto err_drv_init;
+            } else if (m_rx_type == DRIVER_LORCON) {
+                m_rx_drv = new c_drv_lorcon(conf_dev_rx, NULL, 0);
+                if (!m_rx_drv->init())
+                    goto err_drv_init;
+            } else if (m_tx_type == DRIVER_LORCON) {
+                m_tx_drv = new c_drv_lorcon(conf_dev_tx, NULL, 0);
+                if (!m_tx_drv->init())
+                    goto err_drv_init;
+            }
         }
-    }
+    #endif
+    
+    // Netlink
+    #ifdef NETLINK_FOUND
+    
+    #endif
 
 	/*
 	// Libnet

@@ -26,6 +26,9 @@
 #include "drv_main.h"
 #include "pck_main.h"
 
+// Enable check
+#ifdef PCAP_FOUND
+
 // Ext inc
 #include <pcap.h>
 
@@ -96,5 +99,6 @@ class c_drv_pcap : public c_drv {
         static void f_delete_pck(gpointer data);
 };
 
-#endif
+#endif // PCAP_FOUND
+#endif // H_DRV_PCAP
 

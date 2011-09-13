@@ -1,7 +1,7 @@
 /*
- * Airown - Build system constants
+ * Airown - Driver - 802.11 netlink
  *
- * Copyright (C) 2010-2011 sh0 <sh0@yutani.ee>
+ * Copyright (C) 2011 sh0 <sh0@yutani.ee>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,16 +18,56 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef H_AO_CMAKE
-#define H_AO_CMAKE
+// Int inc
+#include "ao_config.h"
+#include "drv_nl.h"
 
-// Version
-#define AO_VERSION "@VERSION@"
+// Enable check
+#ifdef NETLINK_FOUND
 
-// Libraries
-#cmakedefine PCAP_FOUND
-#cmakedefine LORCON_FOUND
-#cmakedefine NETLINK_FOUND
+// Constructor and destructor
+c_drv_netlink::c_drv_netlink(const gchar* dev)
+{
+
+}
+
+c_drv_netlink::~c_drv_netlink()
+{
+
+}
+
+// Init and end
+bool c_drv_netlink::init()
+{
+    return false;
+}
+
+void c_drv_netlink::end()
+{
+
+}
+
+// Output
+void c_drv_netlink::help()
+{
+
+}
+
+const gchar* c_drv_netlink::name()
+{
+    return NULL;
+}
+
+// Packets
+st_pck_drv* c_drv_netlink::pck_rx()
+{
+    return NULL;
+}
+
+void c_drv_netlink::pck_tx(st_pck_drv* data)
+{
+
+}
 
 #endif
 

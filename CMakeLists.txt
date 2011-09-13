@@ -33,9 +33,12 @@ INCLUDE(airown-helpers)
 INCLUDE(airown-libs-general)
 INCLUDE(airown-libs-glib)
 INCLUDE(airown-libs-openssl)
+INCLUDE(airown-libs-pcap)
 INCLUDE(airown-libs-lorcon)
+INCLUDE(airown-libs-netlink)
 INCLUDE(airown-libs-libnet)
 INCLUDE(airown-libs-ncurses)
+MESSAGE(STATUS "################################################")
 
 # Config files
 INCLUDE_DIRECTORIES("${CMAKE_BINARY_DIR}")

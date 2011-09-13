@@ -23,6 +23,9 @@
 #include "drv_lorcon.h"
 #include "pck_main.h"
 
+// Enable check
+#ifdef LORCON_FOUND
+
 // Constructor and destructor
 c_drv_lorcon::c_drv_lorcon(const gchar* dev, const gchar* drv, guint chan)
 {
@@ -347,4 +350,6 @@ void c_drv_lorcon::f_delete_pck(gpointer data)
     g_byte_array_unref(pck->data);
     g_free(pck);
 }
+
+#endif
 

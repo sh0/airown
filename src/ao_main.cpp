@@ -51,11 +51,11 @@ int main(int argc, char* argv[])
     const gchar* cmd_mode_tx = "file";
     const gchar* cmd_dev_tx = "test-tx.pcap";
     GOptionEntry cmd_entry_main[] = {
-        { "rx-drv", '\0', 0, G_OPTION_ARG_STRING, &cmd_drv_rx, "RX driver (pcap / lorcon)" },
-        { "rx-mode", '\0', 0, G_OPTION_ARG_STRING, &cmd_mode_rx, "RX mode (hw / file)" },
+        { "rx-drv", '\0', 0, G_OPTION_ARG_STRING, &cmd_drv_rx, "RX driver" },
+        { "rx-mode", '\0', 0, G_OPTION_ARG_STRING, &cmd_mode_rx, "RX mode (dev / file)" },
         { "rx-dev", '\0', 0, G_OPTION_ARG_STRING, &cmd_dev_rx, "RX device (wlan0 / eth0 / file.pcap)" },
-        { "tx-drv", '\0', 0, G_OPTION_ARG_STRING, &cmd_drv_tx, "TX driver (pcap / lorcon)" },
-        { "tx-mode", '\0', 0, G_OPTION_ARG_STRING, &cmd_mode_tx, "TX mode (hw / file)" },
+        { "tx-drv", '\0', 0, G_OPTION_ARG_STRING, &cmd_drv_tx, "TX driver" },
+        { "tx-mode", '\0', 0, G_OPTION_ARG_STRING, &cmd_mode_tx, "TX mode (dev / file)" },
         { "tx-dev", '\0', 0, G_OPTION_ARG_STRING, &cmd_dev_tx, "TX device (wlan0 / eth0 / file.pcap)" },
         { NULL }
     };
@@ -66,7 +66,18 @@ int main(int argc, char* argv[])
 
     cmd_ctx = g_option_context_new("- packet injection tool");
     g_option_context_add_main_entries(cmd_ctx, cmd_entry_main, NULL);
-    //g_option_context_set_description(cmd_ctx, "");
+    g_option_context_set_description(cmd_ctx,
+        "Supported drivers:\n"
+        #ifdef PCAP_FOUND
+            "  * pcap\n"
+        #endif
+        #ifdef LORCON_FOUND
+            "  * lorcon\n"
+        #endif
+        #ifdef NETLINK_FOUND
+            "  * netlink\n"
+        #endif
+    );
     
     if (!g_option_context_parse(cmd_ctx, &argc, &argv, &cmd_error)) {
         g_message("Option parsing failed: %s", cmd_error->message);

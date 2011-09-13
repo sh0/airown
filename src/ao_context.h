@@ -29,6 +29,7 @@
 
 #include "drv_lorcon.h"
 #include "drv_pcap.h"
+#include "drv_nl.h"
 
 // Context class
 class c_context {
@@ -63,7 +64,8 @@ class c_context {
         typedef enum {
             DRIVER_NONE = 0,
             DRIVER_PCAP,
-            DRIVER_LORCON
+            DRIVER_LORCON,
+            DRIVER_NETLINK
         } en_driver;
         c_drv* m_rx_drv;
         en_driver m_rx_type;
