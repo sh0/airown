@@ -1,7 +1,7 @@
 /*
- * Airown - injecting TCP packets
+ * Airown - User interface - Console
  *
- * Copyright (C) 2010 sh0 <sh0@yutani.ee>
+ * Copyright (C) 2011 sh0 <sh0@yutani.ee>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,15 +18,37 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef H_PK_INJECT_TCP
-#define H_PK_INJECT_TCP
+#ifndef H_UI_CONTEXT
+#define H_UI_CONTEXT
 
 // Int inc
 #include "ao_config.h"
-#include "pk_packet.h"
+#include "ui_main.h"
 
-// Functions
-void inj_tcp(st_ao_packet* pck, guint8* pl_data, guint32 pl_size);
+// UI class
+class c_ui_console : public c_ui {
+    public:
+        // Constructor and destructor
+        c_ui_console();
+        ~c_ui_console();
+        
+        // Init and end
+        bool init();
+        void end();
+        
+        // Messages
+        void message(const gchar* msg);
+        
+    private:
+        // Active
+        bool m_active;
+        
+        // Mutex
+        GMutex* m_mutex;
+        
+        // Glib log handler
+        static void f_log_default(const gchar* log_domain, GLogLevelFlags log_level, const gchar* msg, gpointer user_data);
+};
 
 #endif
 

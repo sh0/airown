@@ -23,7 +23,7 @@ ENDIF (${CMAKE_SOURCE_DIR} MATCHES ${CMAKE_BINARY_DIR})
 
 # Project
 PROJECT(airown)
-SET(VERSION 20100807)
+SET(VERSION 20110913)
 
 # Options
 OPTION(VERBOSE "Verbose cmake output" OFF)
@@ -35,6 +35,7 @@ INCLUDE(airown-libs-glib)
 INCLUDE(airown-libs-openssl)
 INCLUDE(airown-libs-lorcon)
 INCLUDE(airown-libs-libnet)
+INCLUDE(airown-libs-ncurses)
 
 # Config files
 INCLUDE_DIRECTORIES("${CMAKE_BINARY_DIR}")

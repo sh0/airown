@@ -1,7 +1,7 @@
 /*
- * Airown - utility functions
+ * Airown - Utility functions
  *
- * Copyright (C) 2010 sh0 <sh0@yutani.ee>
+ * Copyright (C) 2010-2011 sh0 <sh0@yutani.ee>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,22 +24,31 @@
 // Int inc
 #include "ao_config.h"
 
-// Hex dump
-void dumphex(guint8* data, guint32 len);
-void dumphex_file(FILE* file, guint8* data, guint32 len);
-void dumphex_c(guint8* data, guint32 len);
+// Utility class
+class c_util {
+    public:
+        // Hex dump
+        static void hex_log(const gchar* prefix, guint8* data, guint size);
+        static void hex_log_c(const gchar* prefix, guint8* data, guint size);
+        static void hex_file(const gchar* fn, guint8* data, guint size);
+        static void hex_file_c(const gchar* fn, guint8* data, guint size);
+        static void hex_file_raw(const gchar* fn, guint8* data, guint size);
 
-// Compare addresses
-gboolean cmp_ipv4(struct in_addr* a, struct in_addr* b);
-gboolean cmp_ipv6(struct libnet_in6_addr* a, struct libnet_in6_addr* b);
-gboolean cmp_ipv4_mask(struct in_addr* a, struct in_addr* b, struct in_addr* mask);
-gboolean cmp_ipv6_mask(struct libnet_in6_addr* a,
-                       struct libnet_in6_addr* b,
-                       struct libnet_in6_addr* mask);
+        // Compare addresses
+        static gboolean cmp_ipv4(struct in_addr* a, struct in_addr* b);
+        static gboolean cmp_ipv6(struct libnet_in6_addr* a, struct libnet_in6_addr* b);
+        static gboolean cmp_ipv4_mask(struct in_addr* a, struct in_addr* b, struct in_addr* mask);
+        static gboolean cmp_ipv6_mask(struct libnet_in6_addr* a, struct libnet_in6_addr* b, struct libnet_in6_addr* mask);
 
-// Copy addresses
-void cpy_ipv4(struct in_addr* dst, struct in_addr* src);
-void cpy_ipv6(struct libnet_in6_addr* dst, struct libnet_in6_addr* src);
+        // Copy addresses
+        static void cpy_ipv4(struct in_addr* dst, struct in_addr* src);
+        static void cpy_ipv6(struct libnet_in6_addr* dst, struct libnet_in6_addr* src);
+
+    private:
+        // Hex dump
+        static GString* f_hex_v(guint8* data, guint size);
+        static GString* f_hex_c(guint8* data, guint size);
+};
 
 #endif
 

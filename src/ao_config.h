@@ -1,7 +1,7 @@
 /*
- * Airown - config
+ * Airown - Config
  *
- * Copyright (C) 2010 sh0 <sh0@yutani.ee>
+ * Copyright (C) 2010-2011 sh0 <sh0@yutani.ee>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,17 +24,10 @@
 // Glib
 #include <glib.h>
 
-// Lorcon
-#include <lorcon.h>
-#include <lorcon_ieee80211.h>
-#include <lorcon_packasm.h>
-#include <lorcon_forge.h>
-
 // Libnet
 #include <libnet.h>
-#include <pcap.h>
 
-// Int inc
+// Build system
 #include "ao_cmake.h"
 
 #endif

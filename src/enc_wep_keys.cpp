@@ -22,7 +22,7 @@
 
 // Int inc
 #include "ao_config.h"
-#include "wep_keys.h"
+#include "enc_wep_keys.h"
 
 // Ext inc
 #include <openssl/md5.h>
@@ -124,7 +124,7 @@ void wep_40keyprint(guint8* keys)
  */
 void wep_nkeyprint(guint8* key, guint nbytes)
 {
-    gint i;
+    guint i;
     gchar sepchar;
 
     for (i = 0; i < nbytes; i++) {

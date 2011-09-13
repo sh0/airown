@@ -9,7 +9,7 @@ IF (NOT GLIB_CHECKED)
     MESSAGE(STATUS "Checking for GLib")
 
     # Find
-	PKG_CHECK_MODULES(GLIB glib-2.0)
+	PKG_CHECK_MODULES(GLIB glib-2.0 gthread-2.0)
 	PRINT_LIBRARY_INFO("GLib" GLIB_FOUND "${GLIB_CFLAGS}" "${GLIB_LDFLAGS}")
 
     # Set as checked

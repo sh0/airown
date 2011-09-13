@@ -1,7 +1,7 @@
 /*
- * Airown - layer 4 analysis
+ * Airown - User interface
  *
- * Copyright (C) 2010 sh0 <sh0@yutani.ee>
+ * Copyright (C) 2011 sh0 <sh0@yutani.ee>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,18 +18,25 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef H_PK_LAYER4
-#define H_PK_LAYER4
+#ifndef H_UI_MAIN
+#define H_UI_MAIN
 
 // Int inc
 #include "ao_config.h"
-#include "pk_packet.h"
 
-// Functions
-void pck_tcp_read(st_ao_packet* pck);
-void pck_tcp_free(st_ao_packet* pck);
-void pck_udp_read(st_ao_packet* pck);
-void pck_udp_free(st_ao_packet* pck);
+// UI class
+class c_ui {
+    public:
+        // Destructor
+        virtual ~c_ui() { }
+        
+        // Init and end
+        virtual bool init() = 0;
+        virtual void end() = 0;
+        
+        // Messages
+        virtual void message(const gchar* msg) = 0;
+};
 
 #endif
 

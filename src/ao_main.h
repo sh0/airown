@@ -1,7 +1,7 @@
 /*
- * Airown - main
+ * Airown - Main
  *
- * Copyright (C) 2010 sh0 <sh0@yutani.ee>
+ * Copyright (C) 2010-2011 sh0 <sh0@yutani.ee>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,55 +33,6 @@
 #define AO_PROTO_L4_UDP (1 << 5)
 #define AO_PROTO_L5_PAYLOAD (1 << 6)
 #define AO_PROTO_ALL (AO_PROTO_L2_IEEE80211 | AO_PROTO_L3_IPV4 | AO_PROTO_L3_IPV6 | AO_PROTO_L3_ARP | AO_PROTO_L4_TCP | AO_PROTO_L4_UDP | AO_PROTO_L5_PAYLOAD)
-
-// Instance structure
-struct t_ao_inst {
-    // Lorcon
-    lorcon_t* lor_ctx; // = NULL;
-    // Libnet
-    libnet_t* ln_inst; // = NULL;
-    libnet_ptag_t ln_tcp_t; // = 0; // IMPORTANT!
-    libnet_ptag_t ln_thd_t; // = 0; // IMPORTANT!
-    libnet_ptag_t ln_ip_t; // = 0; // IMPORTANT!
-    // Interface
-    guint32 mtu; // = 0;
-    
-    // WEP
-    gboolean wep_enabled; // = FALSE;
-    guint8* wep_key_data; // = NULL;
-    guint32 wep_key_size; // = 0;
-    
-    // Command line (main)
-    gchar* cmd_iface; // = "wlan0";
-    gchar* cmd_driver; // = NULL;
-    gboolean cmd_drvlist; // = FALSE;
-    gint cmd_channel; // = 0;
-    gchar* cmd_payload; // = NULL;
-    // Command line (debug)
-    gchar* cmd_dbg_mask; // = NULL;
-    gchar* cmd_dbg_show; // = NULL;
-    gchar* cmd_dbg_dump; // = NULL;
-    // NAT masks
-    gchar* cmd_nat4_ip; // = NULL;
-    gchar* cmd_nat4_mask; // = NULL;
-    gchar* cmd_nat6_ip; // = NULL;
-    gchar* cmd_nat6_mask; // = NULL;
-    // Command line (tcp)
-    gchar* cmd_tcp_raw; // = NULL;
-    gchar* cmd_tcp_http; // = NULL;
-    // Debug masks
-    guint32 dbg_mask; // = 0;
-    guint32 dbg_show; // = 0;
-    guint32 dbg_dump; // = 0;
-
-};
-typedef struct t_ao_inst st_ao_inst;
-
-// Instance data
-extern st_ao_inst ao_inst;
-
-// Functions
-void ao_signal(int sig);
 
 #endif
 

@@ -22,7 +22,7 @@
 
 // Int inc
 #include "ao_config.h"
-#include "wep_main.h"
+#include "enc_wep_main.h"
 
 // Macros
 #define SSWAP(a,b) {uint8_t tmp = s[a]; s[a] = s[b]; s[b] = tmp;}

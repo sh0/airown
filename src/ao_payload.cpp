@@ -1,7 +1,7 @@
 /*
- * Airown - payload
+ * Airown - Payload
  *
- * Copyright (C) 2010 sh0 <sh0@yutani.ee>
+ * Copyright (C) 2010-2011 sh0 <sh0@yutani.ee>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+
+#if 0
 
 // Int inc
 #include "ao_config.h"
@@ -370,4 +372,6 @@ int ao_http_hdr_value(http_parser* parser, const char* at, size_t length)
 
     return 0;
 }
+
+#endif
 

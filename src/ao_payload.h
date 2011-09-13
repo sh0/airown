@@ -1,7 +1,7 @@
 /*
- * Airown - payload
+ * Airown - Payload
  *
- * Copyright (C) 2010 sh0 <sh0@yutani.ee>
+ * Copyright (C) 2010-2011 sh0 <sh0@yutani.ee>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#if 0
+
 #ifndef H_AO_PAYLOAD
 #define H_AO_PAYLOAD
 
@@ -29,6 +31,8 @@
 gboolean ao_payload_init();
 void ao_payload_end();
 void ao_payload_pck(st_ao_packet* pck);
+
+#endif
 
 #endif
 
