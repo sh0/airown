@@ -220,10 +220,10 @@ void c_drv_lorcon::end()
 void c_drv_lorcon::help()
 {
     // Driver list
-    g_message("[drv] lorcon drivers:");
+    g_message("Lorcon drivers:");
     lorcon_driver_t* drv_list = lorcon_list_drivers();
     for (lorcon_driver_t* drv_iter = drv_list; drv_iter; drv_iter = drv_iter->next) {
-        g_message("[drv] * %s - %s", drv_iter->name, drv_iter->details);
+        g_message(" * %s - %s", drv_iter->name, drv_iter->details);
     }
     lorcon_free_driver_list(drv_list);
 }

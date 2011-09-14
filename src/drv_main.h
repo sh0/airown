@@ -45,7 +45,6 @@ class c_drv {
         virtual void end() = 0;
         
         // Output
-        virtual void help() = 0;
         virtual const gchar* name() = 0;
         
         // Packets

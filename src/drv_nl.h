@@ -41,7 +41,7 @@ class c_drv_netlink : public c_drv {
         void end();
         
         // Output
-        void help();
+        static void help();
         const gchar* name();
         
         // Packets
@@ -54,13 +54,9 @@ class c_drv_netlink : public c_drv {
         
         // Info
         gchar* m_info_dev;
-        gchar* m_info_drv;
-        guint m_info_chan;
         
         // Netlink
         
-        guint m_mtu;
-        gint m_chan;
         
         // Thread
         GThread* m_thr_thread;

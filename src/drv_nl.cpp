@@ -25,15 +25,37 @@
 // Enable check
 #ifdef NETLINK_FOUND
 
+// Ext inc
+/*
+#include <sys/types.h>
+#include <asm/types.h>
+#include <netlink/genl/genl.h>
+#include <netlink/genl/family.h>
+#include <netlink/genl/ctrl.h>
+#include <netlink/msg.h>
+#include <netlink/attr.h>
+*/
+#include <netlink/netlink.h>
+
 // Constructor and destructor
 c_drv_netlink::c_drv_netlink(const gchar* dev)
 {
-
+    // Deactive
+    m_active = false;
+    
+    // Copy info
+    g_assert(dev);
+    m_info_dev = g_strdup(dev);
 }
 
 c_drv_netlink::~c_drv_netlink()
 {
-
+    // End
+    if (m_active)
+        end();
+    
+    // Free info
+    g_free(m_info_dev);
 }
 
 // Init and end
@@ -50,7 +72,8 @@ void c_drv_netlink::end()
 // Output
 void c_drv_netlink::help()
 {
-
+    // Message
+    g_message("Netlink devices:");
 }
 
 const gchar* c_drv_netlink::name()

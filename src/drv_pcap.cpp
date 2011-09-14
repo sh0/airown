@@ -208,23 +208,28 @@ void c_drv_pcap::end()
 // Output
 void c_drv_pcap::help()
 {
+    // Message
+    g_message("Pcap devices:");
+    
+    // Error buffer
+    gchar errbuf[PCAP_ERRBUF_SIZE];
+    errbuf[0] = '\0';
+    
     // Get devices
-    m_errbuf[0] = '\0';
     pcap_if_t* dev_list = NULL;
-    gint ret = pcap_findalldevs(&dev_list, m_errbuf);
+    gint ret = pcap_findalldevs(&dev_list, errbuf);
     if (ret != 0) {
-        g_critical("[drv] failed to retrieve pcap device list! error=%s", m_errbuf);
+        g_critical(" * Failed to retrieve pcap device list! error=%s", errbuf);
         return;
     } else if (dev_list == NULL) {
-        g_critical("[drv] no pcap devices found!");
+        g_critical(" * No pcap devices found!");
         return;
     }
     
     // Iterate devices
-    g_message("[drv] pcap devices:");
     for (pcap_if_t* dev = dev_list; dev; dev = dev->next) {
         g_message(
-            "[drv] * %s: desc=%s, flags=%s",
+            " * %s: desc=%s, flags=%s",
             dev->name,
             dev->description ? dev->description : "no description",
             dev->flags & PCAP_IF_LOOPBACK ? "loopback" : "none"

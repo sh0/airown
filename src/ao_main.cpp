@@ -22,6 +22,10 @@
 #include "ao_config.h"
 #include "ao_main.h"
 #include "ao_context.h"
+#include "ui_console.h"
+#include "drv_pcap.h"
+#include "drv_lorcon.h"
+#include "drv_nl.h"
 
 // Instance
 static c_context* ao_inst = NULL;
@@ -59,13 +63,29 @@ int main(int argc, char* argv[])
         { "tx-dev", '\0', 0, G_OPTION_ARG_STRING, &cmd_dev_tx, "TX device (wlan0 / eth0 / file.pcap)" },
         { NULL }
     };
+    gboolean cmd_list_pcap = false;
+    gboolean cmd_list_lorcon = false;
+    gboolean cmd_list_netlink = false;
+    GOptionEntry cmd_entry_driver[] = {
+        #ifdef PCAP_FOUND
+            { "list-pcap", '\0', 0, G_OPTION_ARG_NONE, &cmd_list_pcap, "PCAP device list" },
+        #endif
+        #ifdef LORCON_FOUND
+            { "list-lorcon", '\0', 0, G_OPTION_ARG_NONE, &cmd_list_lorcon, "LORCON device list" },
+        #endif
+        #ifdef NETLINK_FOUND
+            { "list-netlink", '\0', 0, G_OPTION_ARG_NONE, &cmd_list_netlink, "NETLINK device list" },
+        #endif
+        { NULL }
+    };
     
     // Parse cmd
     GError* cmd_error = NULL;
-    GOptionContext* cmd_ctx;
-
-    cmd_ctx = g_option_context_new("- packet injection tool");
+    GOptionContext* cmd_ctx = g_option_context_new("- packet injection tool");
     g_option_context_add_main_entries(cmd_ctx, cmd_entry_main, NULL);
+    GOptionGroup* cmd_lgrp = g_option_group_new("list", "Driver devices", "Driver devices", NULL, NULL);
+    g_option_group_add_entries(cmd_lgrp, cmd_entry_driver);
+    g_option_context_add_group(cmd_ctx, cmd_lgrp);
     g_option_context_set_description(cmd_ctx,
         "Supported drivers:\n"
         #ifdef PCAP_FOUND
@@ -78,7 +98,6 @@ int main(int argc, char* argv[])
             "  * netlink\n"
         #endif
     );
-    
     if (!g_option_context_parse(cmd_ctx, &argc, &argv, &cmd_error)) {
         g_message("Option parsing failed: %s", cmd_error->message);
         exit(1);
@@ -93,6 +112,39 @@ int main(int argc, char* argv[])
     
     // Threads
     g_thread_init(NULL);
+    
+    // Lists
+    if (cmd_list_pcap || cmd_list_lorcon || cmd_list_netlink) {
+        // Console
+        c_ui_console* ui = new c_ui_console();
+        ui->init();
+        
+        // Show
+        if (cmd_list_pcap) {
+            #ifdef PCAP_FOUND
+                c_drv_pcap::help();
+            #else
+                g_critical("Pcap driver not compiled in this binary!");
+            #endif
+        }
+        if (cmd_list_lorcon) {
+            #ifdef LORCON_FOUND
+                c_drv_lorcon::help();
+            #else
+                g_critical("Lorcon driver not compiled in this binary!");
+            #endif
+        }
+        if (cmd_list_netlink) {
+            #ifdef NETLINK_FOUND
+                c_drv_netlink::help();
+            #else
+                g_critical("Netlink driver not compiled in this binary!");
+            #endif
+        }
+        
+        // Quit
+        exit(0);
+    }
     
     // Context
     ao_inst = new c_context();

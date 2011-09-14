@@ -50,7 +50,7 @@ class c_drv_lorcon : public c_drv {
         void end();
         
         // Output
-        void help();
+        static void help();
         const gchar* name();
         
         // Packets
