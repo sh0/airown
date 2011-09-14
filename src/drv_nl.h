@@ -56,12 +56,16 @@ class c_drv_netlink : public c_drv {
         gchar* m_info_dev;
         
         // Netlink
-        
+        gchar* m_nl_if;
+        gint m_nl_fd;
+        struct iovec m_nl_recv;
+        struct nl_handle* m_nl_handle;
+        struct nl_cache* m_nl_cache;
+        struct genl_family* m_nl_family;
         
         // Thread
         GThread* m_thr_thread;
         GMutex* m_thr_mutex;
-        GCond* m_thr_cond;
         bool m_thr_run;
         bool m_thr_dead;
         
@@ -72,6 +76,10 @@ class c_drv_netlink : public c_drv {
         // Loop functions
         static gpointer f_loop(gpointer user);
         static void f_delete_pck(gpointer data);
+        
+        // Netlink functions
+        bool f_nl_connect();
+        void f_nl_disconnect();
 };
 
 #endif // NETLINK_FOUND

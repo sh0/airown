@@ -73,8 +73,10 @@ bool c_context::init(
             m_rx_type = DRIVER_PCAP;
             if (!g_strcmp0(conf_mode_rx, "file")) {
                 m_rx_mode = PCAP_MODE_FILE;
+                g_message("[sys] rx enabled: driver=pcap, mode=file, file=%s", conf_dev_rx);
             } else if (!g_strcmp0(conf_mode_rx, "dev")) {
                 m_rx_mode = PCAP_MODE_DEV;
+                g_message("[sys] rx enabled: driver=pcap, mode=dev, device=%s", conf_dev_rx);
             } else {
                 g_critical("[sys] driver pcap does not support rx mode %s, please use either \"file\" or \"dev\"!", conf_mode_rx);
                 goto err_drv_find;
@@ -86,7 +88,9 @@ bool c_context::init(
     } else if (!g_strcmp0(conf_drv_rx, "lorcon")) {
         #ifdef LORCON_FOUND
             m_rx_type = DRIVER_LORCON;
-            if (g_strcmp0(conf_mode_rx, "dev")) {
+            if (!g_strcmp0(conf_mode_rx, "dev")) {
+                g_message("[sys] rx enabled: driver=lorcon, mode=dev, device=%s", conf_dev_rx);
+            } else {
                 g_critical("[sys] driver lorcon does not support rx mode %s, please use \"dev\"!", conf_mode_rx);
                 goto err_drv_find;
             }
@@ -97,7 +101,9 @@ bool c_context::init(
     } else if (!g_strcmp0(conf_drv_rx, "netlink")) {
         #ifdef NETLINK_FOUND
             m_rx_type = DRIVER_NETLINK;
-            if (g_strcmp0(conf_mode_rx, "dev")) {
+            if (!g_strcmp0(conf_mode_rx, "dev")) {
+                g_message("[sys] rx enabled: driver=netlink, mode=dev, device=%s", conf_dev_rx);
+            } else {
                 g_critical("[sys] driver netlink does not support rx mode %s, please use \"dev\"!", conf_mode_rx);
                 goto err_drv_find;
             }
@@ -113,6 +119,7 @@ bool c_context::init(
             m_tx_type = DRIVER_PCAP;
             if (!g_strcmp0(conf_mode_tx, "file")) {
                 m_tx_mode = PCAP_MODE_FILE;
+                g_message("[sys] tx enabled: driver=pcap, mode=file, file=%s", conf_dev_tx);
             } else {
                 g_critical("[sys] driver pcap does not support tx mode %s, please use \"file\"!", conf_mode_tx);
                 goto err_drv_find;
@@ -124,7 +131,9 @@ bool c_context::init(
     } else if (!g_strcmp0(conf_drv_tx, "lorcon")) {
         #ifdef LORCON_FOUND
             m_tx_type = DRIVER_LORCON;
-            if (g_strcmp0(conf_mode_tx, "dev")) {
+            if (!g_strcmp0(conf_mode_tx, "dev")) {
+                g_message("[sys] tx enabled: driver=lorcon, mode=dev, device=%s", conf_dev_tx);
+            } else {
                 g_critical("[sys] driver lorcon does not support tx mode %s, please use \"dev\"!", conf_mode_tx);
                 goto err_drv_find;
             }
@@ -135,7 +144,9 @@ bool c_context::init(
     } else if (!g_strcmp0(conf_drv_tx, "netlink")) {
         #ifdef NETLINK_FOUND
             m_tx_type = DRIVER_NETLINK;
-            if (g_strcmp0(conf_mode_tx, "dev")) {
+            if (!g_strcmp0(conf_mode_tx, "dev")) {
+                g_message("[sys] tx enabled: driver=netlink, mode=dev, device=%s", conf_dev_tx);
+            } else {
                 g_critical("[sys] driver netlink does not support tx mode %s, please use \"dev\"!", conf_mode_tx);
                 goto err_drv_find;
             }
@@ -198,7 +209,28 @@ bool c_context::init(
     
     // Netlink
     #ifdef NETLINK_FOUND
-    
+        if (m_rx_type == DRIVER_NETLINK || m_tx_type == DRIVER_NETLINK) {
+            if (m_rx_type == DRIVER_NETLINK && m_tx_type == DRIVER_NETLINK && !g_strcmp0(conf_dev_rx, conf_dev_tx)) {
+                m_tx_drv = m_rx_drv = new c_drv_netlink(conf_dev_rx);
+                if (!m_rx_drv->init())
+                    goto err_drv_init;
+            } else if (m_rx_type == DRIVER_NETLINK && m_tx_type == DRIVER_NETLINK) {
+                m_rx_drv = new c_drv_netlink(conf_dev_rx);
+                if (!m_rx_drv->init())
+                    goto err_drv_init;
+                m_tx_drv = new c_drv_netlink(conf_dev_tx);
+                if (!m_tx_drv->init())
+                    goto err_drv_init;
+            } else if (m_rx_type == DRIVER_NETLINK) {
+                m_rx_drv = new c_drv_netlink(conf_dev_rx);
+                if (!m_rx_drv->init())
+                    goto err_drv_init;
+            } else if (m_tx_type == DRIVER_NETLINK) {
+                m_tx_drv = new c_drv_netlink(conf_dev_tx);
+                if (!m_tx_drv->init())
+                    goto err_drv_init;
+            }
+        }
     #endif
 
 	/*
@@ -212,6 +244,7 @@ bool c_context::init(
     */
     
     // Mainloop
+    m_kill = false;
     m_mainloop = g_main_loop_new(NULL, FALSE);
     g_idle_add(c_context::f_loop_idle, this);
     
@@ -246,6 +279,9 @@ void c_context::end()
 {
     // Check
     g_assert(m_active);
+    
+    // Mainloop
+    g_main_loop_unref(m_mainloop);
     
     // Driver
     if (m_rx_drv && m_tx_drv && m_rx_drv == m_tx_drv) {
@@ -282,8 +318,7 @@ void c_context::kill()
     g_assert(m_active);
     
     // Kill
-    if (g_main_loop_is_running(m_mainloop))
-        g_main_loop_quit(m_mainloop);
+    m_kill = true;
 }
 
 // Mainloop
@@ -296,16 +331,18 @@ gboolean c_context::f_loop_idle(gpointer data)
     if (ctx->m_rx_drv) {
         st_pck_drv* pck_drv = ctx->m_rx_drv->pck_rx();
         if (pck_drv) {
-            //g_message("[pck] <========================================================================>");
             c_layer_hw* pck_hw = new c_layer_hw();
             if (pck_hw->init_unpack(pck_drv)) {
-                //pck_hw->str_dump();
                 ctx->m_pck_hw = g_list_append(ctx->m_pck_hw, pck_hw);
             } else {
                 delete pck_hw;
             }
         }
     }
+    
+    // Kill
+    if (ctx->m_kill)
+        g_main_loop_quit(ctx->m_mainloop);
     
     // Return
     return TRUE;

@@ -30,13 +30,11 @@
 // Instance
 static c_context* ao_inst = NULL;
 
-// Command-line
-
-
 // Signal
 static void ao_signal(int sig)
 {
     if (sig == SIGINT) {
+        g_print("\n");
         if (ao_inst)
             ao_inst->kill();
     } else if (sig == SIGWINCH) {
@@ -51,7 +49,7 @@ int main(int argc, char* argv[])
     const gchar* cmd_drv_rx = "pcap";
     const gchar* cmd_mode_rx = "file";
     const gchar* cmd_dev_rx = "test-rx.pcap";
-    const gchar* cmd_drv_tx = "pcap";
+    const gchar* cmd_drv_tx = "none";
     const gchar* cmd_mode_tx = "file";
     const gchar* cmd_dev_tx = "test-tx.pcap";
     GOptionEntry cmd_entry_main[] = {
@@ -151,6 +149,7 @@ int main(int argc, char* argv[])
     if (ao_inst->init(cmd_drv_rx, cmd_mode_rx, cmd_dev_rx, cmd_drv_tx, cmd_mode_tx, cmd_dev_tx)) {
         ao_inst->run();
     }
+    delete ao_inst;
 
 	// Return
 	return 0;

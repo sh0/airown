@@ -58,6 +58,42 @@ class c_layer_radiotap : public c_layer {
     private:
         // Headers
         struct radiotap_header m_hdr;
+        static const guint m_ext_num = 5;
+        guint32 m_ext_val[m_ext_num];
+        
+        // Flags
+        bool m_flags_set;
+        guint8 m_flags_val;
+        
+        // Rate
+        bool m_rate_set;
+        guint8 m_rate_val;
+        
+        // Channel
+        bool m_chan_set;
+        struct {
+            guint16 freq;
+            guint16 flags;
+        } __attribute__((__packed__)) m_chan_val;
+        
+        // FHSS
+        bool m_fhss_set;
+        struct {
+            guint8 hop_set;
+            guint8 hop_pattern;
+        } __attribute__((__packed__)) m_fhss_val;
+        
+        // Antenna noise
+        bool m_ant_noise_set;
+        gint8 m_ant_noise_val;
+        
+        // Antenna signal dB
+        bool m_ant_signal_db_set;
+        guint8 m_ant_signal_db_val;
+        
+        // TX flags
+        bool m_txflags_set;
+        guint16 m_txflags_val;
         
         // Endpoints
         st_ep m_ep;

@@ -86,6 +86,7 @@ class c_context {
         */
         
         // Mainloop
+        bool m_kill;
         GMainLoop* m_mainloop;
         static gboolean f_loop_idle(gpointer data);
 };
